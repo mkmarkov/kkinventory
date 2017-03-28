@@ -1,0 +1,83 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>login</title>
+</h:head>
+<h:body>
+	<h:form id="form">
+		<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
+		<p:panelGrid columns="2">
+
+			<p:treeTable id="stocktable" var="stock"
+				value="#{adminPanelBean.root}"
+				selection="#{adminPanelBean.selectedNode}" selectionMode="single"
+				rowKey="#{stock.itemID}" scrollable="true" scrollHeight="450">
+				<p:ajax event="select" listener="#{adminPanelBean.setselected()}"
+					update="form:AddStockQuantitypanel" />
+				<p:column headerText="Категория">
+			#{stock.cat.itemCategory}
+			 	</p:column>
+				<p:column headerText="Код">
+			#{stock.item.itemCode}
+			 	</p:column>
+				<p:column headerText="Вариация">
+			#{stock.item.itemVariation}
+			 	</p:column>
+				<p:column headerText="Наличност">
+			#{stock.item.stock}
+			 	</p:column>
+				<p:column headerText="Цена">
+			#{stock.item.price}
+			 	</p:column>
+			</p:treeTable>
+
+			<p:panel id="AddStockQuantitypanel">
+		Код
+		<p:inputText value="#{adminPanelBean.selectedItem.item.itemCode}"
+					readonly="true" disabled="true" />
+		Вариация
+		<p:inputText value="#{adminPanelBean.selectedItem.item.itemVariation}"
+					readonly="true" disabled="true" />
+		Наличност
+		<p:inputText value="#{adminPanelBean.selectedItem.item.stock}"
+					readonly="true" disabled="true" />
+		Количество
+		<p:inputText binding="#{qty}" />
+				<p:commandButton value="Добави	"
+					action="#{adminPanelBean.addStockQuantity(qty.value)}" />
+			</p:panel>
+		</p:panelGrid>
+
+		<p:dataTable id="errorTable" var="errors"
+			value="#{adminPanelBean.historyList}"
+			selection="#{adminPanelBean.selectedHistory}" selectionMode="single"
+			rowKey="#{errors.logID}">
+			<p:column headerText="Код">
+			#{errors.itemCode}
+			</p:column>
+			<p:column headerText="Вариация">
+			#{errors.itemVariation}
+			</p:column>
+			<p:column headerText="Наличност">
+			#{errors.quantity}
+			</p:column>
+			<p:column headerText="Служител">
+			#{errors.employee}
+			</p:column>
+			<p:column headerText="Детайли на поръчката">
+			#{errors.orderDetails}
+			</p:column>
+			<p:column headerText="Дата">
+			#{errors.timestamp}
+			</p:column>
+			<f:facet name="footer">
+				<p:commandButton value="Потвърди грешка"
+					action="#{adminPanelBean.approveMarkedError()}" update="errorTable" />
+			</f:facet>
+		</p:dataTable>
+	</h:form>
+</h:body>
+</html>

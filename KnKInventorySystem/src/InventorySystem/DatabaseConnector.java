@@ -345,11 +345,11 @@ public class DatabaseConnector {
 		return true;
 	}
 
-	public Boolean AddStockQuantity(int ItemCode, int Quantity) {
+	public Boolean AddStockQuantity(String ItemCode, int Quantity) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(AddStockQuantityJDBCCall);
-			call.setInt(1, ItemCode);
+			call.setString(1, ItemCode);
 			call.setInt(2, Quantity);
 			call.execute();
 		} catch (SQLException e) {

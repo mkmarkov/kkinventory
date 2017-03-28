@@ -133,10 +133,6 @@ public class InventoryBean {
 		dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, ImageName, ItemCatID, price);
 	}
 
-	public void AddStockQuantity(int ItemID, int Quantity) {
-		dbconn.AddStockQuantity(ItemID, Quantity);
-	}
-
 	public void removeStockQty(int ItemID, int Quantity) {
 		dbconn.RemoveStockQuantity(ItemID, Quantity);
 	}

@@ -13,11 +13,10 @@
   PATH="/InventoryPage.xhtml" SHAPE="240,33,0,0" model-entity="JSFProcessGroup">
   <PROCESS-ITEM ID="rules:#InventoryPage.xhtml:0" NAME="item"
    PATH="/InventoryPage.xhtml" model-entity="JSFProcessItem">
-   <PROCESS-ITEM-OUTPUT ID="admin::#AdminPanel.xhtml" NAME="output"
-    PATH="/AdminPanel.xhtml" TARGET="rules:#AdminPanel.xhtml"
-    TITLE="admin" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="admin::#admin.xhtml" NAME="output"
+    PATH="/admin.xhtml" TARGET="rules:#admin.xhtml" TITLE="admin" model-entity="JSFProcessItemOutput"/>
   </PROCESS-ITEM>
  </PROCESS-ITEM>
- <PROCESS-ITEM NAME="rules:#AdminPanel.xhtml" PATH="/AdminPanel.xhtml"
+ <PROCESS-ITEM NAME="rules:#admin.xhtml" PATH="/admin.xhtml"
   SHAPE="448,17,0,0" model-entity="JSFProcessGroup"/>
 </PROCESS>
