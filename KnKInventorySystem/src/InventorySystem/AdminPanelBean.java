@@ -31,6 +31,7 @@ public class AdminPanelBean {
 	StockItemDataType selectedStock = new StockItemDataType();
 	ItemCategoryDataType selectedCategory = new ItemCategoryDataType();
 	ItemDataType selectedItem = new ItemDataType();
+	List<LogDataType> userReport = new ArrayList<>();
 
 	public void init() {
 		historyList = dbconn.getUserHistory_error();
@@ -43,6 +44,27 @@ public class AdminPanelBean {
 		loadTree();
 	}
 
+	public void getReport(String employee) {
+		userReport = dbconn.getUserHistory(employee);
+	}
+
+	public void addCategory(String Category) {
+		dbconn.AddCategory(Category, Category);
+	}
+
+	public void deleteCategory() {
+		dbconn.deleteCategory(selectedCategory.getItemCatID());
+	}
+
+	public void addStock(String ItemCode, String ItemVariation, String Color, int Stock, String ImageName, double price,
+			String ItemCategory) {
+		dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, ImageName, price, ItemCategory);
+	}
+
+	public void deleteStock() {
+		dbconn.deleteStock(selectedItem.getItem().ItemID);
+	}
+
 	public void approveMarkedError() {
 		if (dbconn.ReturnStock(selectedHistory.ItemID, selectedHistory.Quantity))
 			dbconn.approveMarkedError(selectedHistory.LogID);
@@ -51,7 +73,6 @@ public class AdminPanelBean {
 	public void addUser(String Username, String Password) {
 		dbconn.addLogin(Username, Password);
 	}
-
 	public void removeUser() {
 		dbconn.removeLogin(selectedLogin.getUserID());
 	}
@@ -87,6 +108,30 @@ public class AdminPanelBean {
 	}
 
 	///////////////////////////////////////////////////
+
+	public List<ItemCategoryDataType> getCategories() {
+		return categories;
+	}
+
+	public List<LogDataType> getUserReport() {
+		return userReport;
+	}
+
+	public void setUserReport(List<LogDataType> userReport) {
+		this.userReport = userReport;
+	}
+
+	public DatabaseConnector getDbconn() {
+		return dbconn;
+	}
+
+	public void setDbconn(DatabaseConnector dbconn) {
+		this.dbconn = dbconn;
+	}
+
+	public void setCategories(List<ItemCategoryDataType> categories) {
+		this.categories = categories;
+	}
 
 	public ItemDataType getSelectedItem() {
 		return selectedItem;

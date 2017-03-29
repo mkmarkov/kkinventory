@@ -37,4 +37,8 @@ public class ItemCategoryDataType {
 	public void setItemSubcategory(String ItemSubcategory) {
 		this.ItemSubcategory = ItemSubcategory;
 	}
+	@Override
+	public String toString() {
+		return ItemCategory;
+	}
 }

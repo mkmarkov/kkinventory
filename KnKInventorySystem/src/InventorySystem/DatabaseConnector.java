@@ -47,6 +47,7 @@ public class DatabaseConnector {
 	}
 
 	public List<Logins> getLogins_all() {
+		ConnectToDB();
 		List<Logins> temp = new ArrayList<>();
 		try {
 			CallableStatement call = conn.prepareCall(getLogins_all);
@@ -365,7 +366,7 @@ public class DatabaseConnector {
 	}
 
 	public Boolean AddStock(String ItemCode, String ItemVariation, String Color, int Stock, String ImageName,
-			int ItemCatID, double price) {
+			double price,String ItemCategory) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(AddStockJDBCCall);
@@ -374,8 +375,8 @@ public class DatabaseConnector {
 			call.setString(3, Color);
 			call.setInt(4, Stock);
 			call.setString(5, ImageName);
-			call.setInt(6, ItemCatID);
-			call.setFloat(7, (float) price);
+			call.setFloat(6, (float) price);
+			call.setString(7, ItemCategory);
 			call.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();

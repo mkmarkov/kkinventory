@@ -5,79 +5,185 @@
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
 	<title>login</title>
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
+	</f:metadata>
 </h:head>
 <h:body>
 	<h:form id="form">
-		<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
-		<p:panelGrid columns="2">
-
-			<p:treeTable id="stocktable" var="stock"
-				value="#{adminPanelBean.root}"
-				selection="#{adminPanelBean.selectedNode}" selectionMode="single"
-				rowKey="#{stock.itemID}" scrollable="true" scrollHeight="450">
-				<p:ajax event="select" listener="#{adminPanelBean.setselected()}"
-					update="form:AddStockQuantitypanel" />
-				<p:column headerText="Категория">
+		<f:metadata>
+			<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
+		</f:metadata>
+		<p:tabView id="tabview">
+			<p:tab id="stocktab" title="Управление на артикули">
+				<p:panelGrid id="stockpnlgrid" columns="2">
+					<p:treeTable id="stocktable" var="stock"
+						value="#{adminPanelBean.root}"
+						selection="#{adminPanelBean.selectedNode}" selectionMode="single"
+						rowKey="#{stock.itemID}" scrollable="true" scrollHeight="300">
+						<p:ajax event="select" listener="#{adminPanelBean.setselected()}"
+							update="form:tabview:AddStockQuantitypanel" />
+						<p:column headerText="Категория">
 			#{stock.cat.itemCategory}
 			 	</p:column>
-				<p:column headerText="Код">
+						<p:column headerText="Код">
 			#{stock.item.itemCode}
 			 	</p:column>
-				<p:column headerText="Вариация">
+						<p:column headerText="Вариация">
 			#{stock.item.itemVariation}
 			 	</p:column>
-				<p:column headerText="Наличност">
+						<p:column headerText="Наличност">
 			#{stock.item.stock}
 			 	</p:column>
-				<p:column headerText="Цена">
+						<p:column headerText="Цена">
 			#{stock.item.price}
 			 	</p:column>
-			</p:treeTable>
+					</p:treeTable>
 
-			<p:panel id="AddStockQuantitypanel">
+					<p:panel id="AddStockQuantitypanel" header="Опции за артикул">
+						<p:panelGrid columns="2">
 		Код
 		<p:inputText value="#{adminPanelBean.selectedItem.item.itemCode}"
-					readonly="true" disabled="true" />
+								readonly="true" disabled="true" />
 		Вариация
 		<p:inputText value="#{adminPanelBean.selectedItem.item.itemVariation}"
-					readonly="true" disabled="true" />
+								readonly="true" disabled="true" />
 		Наличност
 		<p:inputText value="#{adminPanelBean.selectedItem.item.stock}"
-					readonly="true" disabled="true" />
+								readonly="true" disabled="true" />
 		Количество
 		<p:inputText binding="#{qty}" />
-				<p:commandButton value="Добави	"
-					action="#{adminPanelBean.addStockQuantity(qty.value)}" />
-			</p:panel>
-		</p:panelGrid>
+							<p:commandButton value="Добави	"
+								action="#{adminPanelBean.addStockQuantity(qty.value)}" />
+							<p:commandButton value="Изтрий" action="#{adminPanelBean.del}" />
+						</p:panelGrid>
+					</p:panel>
 
-		<p:dataTable id="errorTable" var="errors"
-			value="#{adminPanelBean.historyList}"
-			selection="#{adminPanelBean.selectedHistory}" selectionMode="single"
-			rowKey="#{errors.logID}">
-			<p:column headerText="Код">
+					<p:panel id="addStock" header="Добавяне на арткул"
+						style="width:450px">
+						<p:panelGrid columns="2">
+		Код
+		<p:inputText binding="#{code_addItem}" />
+		Вариация
+		<p:inputText binding="#{var_addItem}" />
+		Цвят
+		<p:inputText binding="#{color_addItem}" />
+		Цена
+		<p:inputText binding="#{price_addItem}" />
+		Наличност
+		<p:inputText binding="#{qty_addItem}" />
+							<p:commandButton value="Добави	"
+								action="#{adminPanelBean.addStock(qty.value)}" />
+						</p:panelGrid>
+					</p:panel>
+					<p:panel header="Управление на категории"
+						style="width:450px;height:280px">
+						<p:panelGrid columns="2">
+							<p:selectOneListbox id="categories"
+								value="#{adminPanelBean.selectedCategory}">
+								<f:selectItems value="#{adminPanelBean.categories}" />
+							</p:selectOneListbox>
+							<p:commandButton value="Изтрий"
+								action="#{adminPanelBean.deleteCategory()}" />
+							<p:inputText binding="#{newcat}" />
+							<p:commandButton value="Добави"
+								action="#{adminPanelBean.addCategory(newcat.value)}" />
+						</p:panelGrid>
+					</p:panel>
+				</p:panelGrid>
+			</p:tab>
+			<p:tab id="usermgmtTab" title="Управление на потребители">
+				<p:panelGrid columns="2">
+					<p:dataTable id="errorTable" var="errors"
+						value="#{adminPanelBean.historyList}"
+						selection="#{adminPanelBean.selectedHistory}"
+						selectionMode="single" rowKey="#{errors.logID}">
+						<p:column headerText="Код">
 			#{errors.itemCode}
 			</p:column>
-			<p:column headerText="Вариация">
+						<p:column headerText="Вариация">
 			#{errors.itemVariation}
 			</p:column>
-			<p:column headerText="Наличност">
+						<p:column headerText="Наличност">
 			#{errors.quantity}
 			</p:column>
-			<p:column headerText="Служител">
+						<p:column headerText="Служител">
 			#{errors.employee}
 			</p:column>
-			<p:column headerText="Детайли на поръчката">
+						<p:column headerText="Детайли на поръчката">
 			#{errors.orderDetails}
 			</p:column>
-			<p:column headerText="Дата">
+						<p:column headerText="Дата">
 			#{errors.timestamp}
 			</p:column>
-			<f:facet name="footer">
-				<p:commandButton value="Потвърди грешка"
-					action="#{adminPanelBean.approveMarkedError()}" update="errorTable" />
-			</f:facet>
-		</p:dataTable>
+						<f:facet name="footer">
+							<p:commandButton value="Потвърди грешка"
+								action="#{adminPanelBean.approveMarkedError()}"
+								update="errorTable" />
+						</f:facet>
+					</p:dataTable>
+
+					<p:panel id="reportpanel">
+						Потребител: <p:inputText binding="#{reportInput}" />
+						<p:commandButton value="Отчет"
+							action="#{adminPanelBean.getReport(reportInput.value)}"
+							update="form:tabview:reportpanel" style="margin-left: 10px" />
+						<p:dataTable id="reportTable" var="report"
+							value="#{adminPanelBean.userReport}" scrollable="true"
+							scrollHeight="350">
+							<p:ajax event="rowSelect" partialSubmit="true" />
+							<p:column headerText="Служител">
+				#{report.employee}
+			</p:column>
+							<p:column headerText="Код">
+				#{report.itemCode}
+			</p:column>
+							<p:column headerText="Вариация">
+				#{report.itemVariation}
+			</p:column>
+							<p:column headerText="Количество">
+				#{report.quantity}
+			</p:column>
+							<p:column headerText="Дата">
+				#{report.timestamp}
+			</p:column>
+							<p:column headerText="Детайли на поръчката">
+				#{report.orderDetails}
+			</p:column>
+						</p:dataTable>
+
+					</p:panel>
+					<p:panel id="loginpanel">
+						<p:panelGrid columns="2">
+							<p:selectOneListbox value="#{adminPanelBean.selectedLogin}"
+								scrollHeight="150">
+								<p:ajax event="change" partialSubmit="true"
+									update="form:tabview:loginpanel" />
+								<f:selectItems value="#{adminPanelBean.loginsList}" />
+							</p:selectOneListbox>
+							<p:panel>
+								<p:panelGrid columns="2">
+								Потребител <p:inputText
+										value="#{adminPanelBean.selectedLogin.username}"
+										binding="#{addusr}" />
+								Парола <p:inputText
+										value="#{adminPanelBean.selectedLogin.password}"
+										binding="#{addpwd}" />
+									<p:commandButton value="Добави"
+										action="#{adminPanelBean.addUser(addusr.value,addpwd.value)}" />
+									<p:commandButton value="Изтрий"
+										action="#{adminPanelBean.removeUser()}" />
+								</p:panelGrid>
+							</p:panel>
+						</p:panelGrid>
+					</p:panel>
+				</p:panelGrid>
+
+			</p:tab>
+
+		</p:tabView>
+
+
 	</h:form>
 </h:body>
 </html>

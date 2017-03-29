@@ -28,6 +28,7 @@ public class InventoryBean {
 	TreeNode selectedNode = new DefaultTreeNode();
 	LogDataType selectedHistory = new LogDataType();
 
+
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
 			Iterator<LogDataType> itr = historyList.iterator();
@@ -48,7 +49,7 @@ public class InventoryBean {
 		{
 			selectedItem.getItem().Stock -= Quantity;
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-					Quantity, OrderDetails, "Remove",selectedItem.getItem().ItemID);
+					Quantity, OrderDetails, "Remove", selectedItem.getItem().ItemID);
 		}
 		historyList = dbconn.getUserHistory(Employee);
 	}
@@ -126,42 +127,6 @@ public class InventoryBean {
 
 	public void setRoot(TreeNode root) {
 		this.root = root;
-	}
-
-	public void addStock(String ItemCode, String ItemVariation, String Color, int Stock, String ImageName,
-			int ItemCatID, double price) {
-		dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, ImageName, ItemCatID, price);
-	}
-
-	public void removeStockQty(int ItemID, int Quantity) {
-		dbconn.RemoveStockQuantity(ItemID, Quantity);
-	}
-
-	public void addCategory(String Cat, String Subcat) {
-		dbconn.AddCategory(Cat, Subcat);
-
-	}
-
-	public void deleteCategory(int catid) {
-		dbconn.deleteCategory(catid);
-	}
-
-	public void changecat(int catid, String cat, String subcat) {
-		dbconn.changeCategory(catid, cat, subcat);
-
-	}
-
-	public void getUserHistory(String Employee) {
-		dbconn.getUserHistory(Employee);
-	}
-
-	public void AddUserHistory(String Employee, String ItemCode, String ItemVariation, int Quantity,
-			String OrderDetails, String Action,int ItemID) {
-		dbconn.addUserHistory(Employee, ItemCode, ItemVariation, Quantity, OrderDetails, Action,ItemID);
-	}
-
-	public void deleteStock(int ItemID) {
-		dbconn.deleteStock(ItemID);
 	}
 
 	public ItemDataType getSelectedItem() {

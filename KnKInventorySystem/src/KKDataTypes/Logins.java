@@ -38,4 +38,8 @@ public class Logins {
 		Password = password;
 	}
 
+	@Override
+	public String toString() {
+		return Username;
+	}
 }
