@@ -17,7 +17,7 @@ public class DatabaseConnector {
 
 	private final String GetStockJDBCCall = "{ call getStock (?,?)}"; // ItemCode,ItemVariation
 	private final String AddStockJDBCCall = "{ call addStock (?,?,?,?,?,?,?)}"; // ItemCode,ItemVariation,Color,Stock,ImageName,ItemCatID,price
-	private final String deleteStock = "{ call deleteStock ? }"; // ItemID;
+	private final String deleteStock = "{ call deleteStock (?) }"; // ItemID;
 	private final String AddStockQuantityJDBCCall = "{ call addStockQuantity (?,?)}"; // ItemID,Quantity
 	private final String RemoveStockQuantityJDBCCall = "{ call removeStockQuantity (?,?)}"; // ItemID,Quantity
 	private final String GetUserHistoryJDBCCall = "{ call getUserHistory (?)}"; // Employee
@@ -73,7 +73,9 @@ public class DatabaseConnector {
 			CallableStatement call = conn.prepareCall(addLogin);
 			call.setString(1, Username);
 			call.setString(2, Password);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -85,7 +87,7 @@ public class DatabaseConnector {
 				return false;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean removeLogin(int UserID) {
@@ -93,7 +95,9 @@ public class DatabaseConnector {
 		try {
 			CallableStatement call = conn.prepareCall(removeLogin);
 			call.setInt(1, UserID);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -105,7 +109,7 @@ public class DatabaseConnector {
 				return false;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean approveMarkedError(int LogID) {
@@ -113,7 +117,9 @@ public class DatabaseConnector {
 		try {
 			CallableStatement call = conn.prepareCall(approveMarkedError);
 			call.setInt(1, LogID);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -125,7 +131,7 @@ public class DatabaseConnector {
 				return false;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean MarkHistoryAsError(int LogID) {
@@ -133,7 +139,9 @@ public class DatabaseConnector {
 		try {
 			CallableStatement call = conn.prepareCall(markHistoryAsError);
 			call.setInt(1, LogID);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -145,7 +153,7 @@ public class DatabaseConnector {
 				return false;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean ReturnStock(int ItemID, int Quantity) {
@@ -154,7 +162,9 @@ public class DatabaseConnector {
 			CallableStatement call = conn.prepareCall(ReturnStock);
 			call.setInt(1, ItemID);
 			call.setInt(2, Quantity);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -164,7 +174,7 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean deleteStock(int ItemID) {
@@ -172,7 +182,9 @@ public class DatabaseConnector {
 		try {
 			CallableStatement call = conn.prepareCall(deleteStock);
 			call.setInt(1, ItemID);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -182,7 +194,7 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean deleteCategory(int ItemCatID) {
@@ -190,7 +202,9 @@ public class DatabaseConnector {
 		try {
 			CallableStatement call = conn.prepareCall(DeleteCategory);
 			call.setInt(1, ItemCatID);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -200,7 +214,7 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean AddCategory(String ItemCategory, String ItemSubcategory) {
@@ -209,7 +223,9 @@ public class DatabaseConnector {
 			CallableStatement call = conn.prepareCall(AddCategory);
 			call.setString(1, ItemCategory);
 			call.setString(2, ItemSubcategory);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -219,7 +235,7 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean changeCategory(int ItemCatID, String ItemCategory, String ItemSubcategory) {
@@ -229,7 +245,9 @@ public class DatabaseConnector {
 			call.setInt(1, ItemCatID);
 			call.setString(2, ItemCategory);
 			call.setString(3, ItemSubcategory);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -239,13 +257,12 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
-	public List<LogDataType> addUserHistory(String Employee, String ItemCode, String ItemVariation, int Quantity,
+	public boolean addUserHistory(String Employee, String ItemCode, String ItemVariation, int Quantity,
 			String OrderDetails, String Action, int ItemID) {
 		ConnectToDB();
-		List<LogDataType> list = new ArrayList<>();
 		CallableStatement call;
 		try {
 			call = conn.prepareCall(AddUserHistoryJDBCCall);
@@ -256,7 +273,9 @@ public class DatabaseConnector {
 			call.setString(5, OrderDetails);
 			call.setString(6, Action);
 			call.setInt(7, ItemID);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -267,7 +286,7 @@ public class DatabaseConnector {
 			}
 		}
 
-		return list;
+		return false;
 	}
 
 	public List<LogDataType> getUserHistory(String Employee) {
@@ -331,8 +350,9 @@ public class DatabaseConnector {
 			CallableStatement call = conn.prepareCall(RemoveStockQuantityJDBCCall);
 			call.setInt(1, ItemID);
 			call.setInt(2, Quantity);
-			call.execute();
-
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -343,16 +363,18 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
-	public Boolean AddStockQuantity(String ItemCode, int Quantity) {
+	public Boolean AddStockQuantity(int ItemID, int Quantity) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(AddStockQuantityJDBCCall);
-			call.setString(1, ItemCode);
+			call.setInt(1, ItemID);
 			call.setInt(2, Quantity);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -362,11 +384,11 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public Boolean AddStock(String ItemCode, String ItemVariation, String Color, int Stock, String ImageName,
-			double price,String ItemCategory) {
+			double price, String ItemCategory) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(AddStockJDBCCall);
@@ -377,7 +399,9 @@ public class DatabaseConnector {
 			call.setString(5, ImageName);
 			call.setFloat(6, (float) price);
 			call.setString(7, ItemCategory);
-			call.execute();
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -387,7 +411,7 @@ public class DatabaseConnector {
 				e.printStackTrace();
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public List<ItemCategoryDataType> getCategories() {

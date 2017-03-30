@@ -34,6 +34,19 @@ public class AdminPanelBean {
 	List<LogDataType> userReport = new ArrayList<>();
 
 	public void init() {
+		if (stockList.isEmpty()) {
+			historyList = dbconn.getUserHistory_error();
+			loginsList = dbconn.getLogins_all();
+			stockList.clear();
+			categories.clear();
+			root.getChildren().clear();
+			stockList = dbconn.SearchStock("", "");
+			categories = dbconn.getCategories();
+			loadTree();
+		}
+	}
+
+	public void reload() {
 		historyList = dbconn.getUserHistory_error();
 		loginsList = dbconn.getLogins_all();
 		stockList.clear();
@@ -56,13 +69,20 @@ public class AdminPanelBean {
 		dbconn.deleteCategory(selectedCategory.getItemCatID());
 	}
 
-	public void addStock(String ItemCode, String ItemVariation, String Color, int Stock, String ImageName, double price,
-			String ItemCategory) {
-		dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, ImageName, price, ItemCategory);
+	public void addStock(String ItemCode, String ItemVariation, String Color,
+						int Stock, double price, String Employee) {
+		if (dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, "ImageName", price, "3"))
+			;
+		dbconn.addUserHistory(Employee, ItemCode, ItemVariation, Stock, "", "NEWITEM", 0);
+		reload();
 	}
 
-	public void deleteStock() {
-		dbconn.deleteStock(selectedItem.getItem().ItemID);
+	public void deleteStock(String Employee) {
+		if (dbconn.deleteStock(selectedItem.getItem().ItemID))
+			;
+		dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
+				selectedItem.getItem().Stock, "", "DELETE", selectedItem.getItem().ItemID);
+		reload();
 	}
 
 	public void approveMarkedError() {
@@ -73,12 +93,17 @@ public class AdminPanelBean {
 	public void addUser(String Username, String Password) {
 		dbconn.addLogin(Username, Password);
 	}
+
 	public void removeUser() {
 		dbconn.removeLogin(selectedLogin.getUserID());
 	}
 
-	public void addStockQuantity(int Quantity) {
-		dbconn.AddStockQuantity(selectedStock.ItemCode, Quantity);
+	public void addStockQuantity(int Quantity, String Employee) {
+		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
+			;
+		dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation, Quantity,
+				"", "Add", selectedItem.getItem().ItemID);
+		reload();
 	}
 
 	public void loadTree() {
@@ -174,6 +199,8 @@ public class AdminPanelBean {
 	}
 
 	public Logins getSelectedLogin() {
+		if (selectedLogin == null)
+			return new Logins();
 		return selectedLogin;
 	}
 

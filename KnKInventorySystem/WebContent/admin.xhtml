@@ -11,9 +11,6 @@
 </h:head>
 <h:body>
 	<h:form id="form">
-		<f:metadata>
-			<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
-		</f:metadata>
 		<p:tabView id="tabview">
 			<p:tab id="stocktab" title="Управление на артикули">
 				<p:panelGrid id="stockpnlgrid" columns="2">
@@ -53,9 +50,12 @@
 								readonly="true" disabled="true" />
 		Количество
 		<p:inputText binding="#{qty}" />
-							<p:commandButton value="Добави	"
-								action="#{adminPanelBean.addStockQuantity(qty.value)}" />
-							<p:commandButton value="Изтрий" action="#{adminPanelBean.del}" />
+							<p:commandButton value="Добави"
+								action="#{adminPanelBean.addStockQuantity(qty.value,login.user)}"
+								update="form:tabview:stockpnlgrid" />
+							<p:commandButton value="Изтрий"
+								action="#{adminPanelBean.deleteStock(login.user)}"
+								update="form:tabview:stockpnlgrid" />
 						</p:panelGrid>
 					</p:panel>
 
@@ -73,7 +73,8 @@
 		Наличност
 		<p:inputText binding="#{qty_addItem}" />
 							<p:commandButton value="Добави	"
-								action="#{adminPanelBean.addStock(qty.value)}" />
+								action="#{adminPanelBean.addStock(code_addItem.value,var_addItem.value,color_addItem.value,qty_addItem.value,price_addItem.value,login.user)}"
+								update="form:tabview:stockpnlgrid" />
 						</p:panelGrid>
 					</p:panel>
 					<p:panel header="Управление на категории"
