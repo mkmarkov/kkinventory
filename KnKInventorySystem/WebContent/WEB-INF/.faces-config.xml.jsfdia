@@ -18,5 +18,12 @@
   </PROCESS-ITEM>
  </PROCESS-ITEM>
  <PROCESS-ITEM NAME="rules:#admin.xhtml" PATH="/admin.xhtml"
-  SHAPE="448,17,0,0" model-entity="JSFProcessGroup"/>
+  SHAPE="448,17,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#admin.xhtml:0" NAME="item"
+   PATH="/admin.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT ID="inventory::#InventoryPage.xhtml"
+    NAME="output" PATH="/InventoryPage.xhtml"
+    TARGET="rules:#InventoryPage.xhtml" TITLE="inventory" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
 </PROCESS>

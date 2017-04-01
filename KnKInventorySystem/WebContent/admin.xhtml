@@ -11,6 +11,27 @@
 </h:head>
 <h:body>
 	<h:form id="form">
+	<p:toolbar>
+		<f:facet name="left">
+				Добре дошли, #{login.user}
+				<span class="ui-separator"> <span
+				class="ui-icon ui-icon-grip-dotted-vertical" />
+			</span>
+				Код: 
+				<h:inputText binding="#{code}" style="margin-left: 10px" />
+				Вариация:
+				<h:inputText binding="#{variation}" style="margin-left: 10px" />
+			<p:commandButton value="Търси"
+				update="form" style="margin-left: 10px" />
+
+		</f:facet>
+
+		<f:facet name="right">
+			<p:commandButton value="Инвентар"
+				action="#{navigationHandler.navigateToInventory()}" />
+			<p:commandButton value="Изход" action="#{login.logout()}" />
+		</f:facet>
+	</p:toolbar>
 		<p:messages id="messages" showDetail="true" autoUpdate="true"
 			closable="true" />
 		<p:tabView id="tabview">
@@ -134,7 +155,10 @@
 						Потребител: <p:inputText binding="#{reportInput}" />
 						<p:commandButton value="Отчет"
 							action="#{adminPanelBean.getReport(reportInput.value)}"
-							update="form:tabview:usermgmtTab" style="margin-left: 10px" />
+							update="reportTable" style="margin-left: 10px" />
+						<p:commandButton value="Изчисти"
+							action="#{adminPanelBean.clearReport()}"
+							update="reportTable" style="margin-left: 10px" />
 						<p:dataTable id="reportTable" var="report"
 							value="#{adminPanelBean.userReport}" scrollable="true"
 							scrollHeight="350">

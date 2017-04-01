@@ -17,4 +17,11 @@
 			<to-view-id>/admin.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>/admin.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>inventory</from-outcome>
+			<to-view-id>/InventoryPage.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
 </faces-config>

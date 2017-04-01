@@ -67,7 +67,9 @@ public class AdminPanelBean {
 		if (dbconn.AddCategory(Category, Category))
 			categories = dbconn.getCategories();
 	}
-
+	public void clearReport(){
+		userReport.clear();
+	}
 	public void deleteCategory() {
 		Iterator<ItemCategoryDataType> itr = categories.iterator();
 		int catid = 0;
