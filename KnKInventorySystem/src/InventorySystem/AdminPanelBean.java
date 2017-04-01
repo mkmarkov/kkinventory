@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -23,13 +25,13 @@ public class AdminPanelBean {
 	TreeNode root = new DefaultTreeNode();
 	List<LogDataType> historyList = new ArrayList<>();
 	List<Logins> loginsList = new ArrayList<>();
-	Logins selectedLogin = new Logins();
 	LogDataType selectedHistory = new LogDataType();
 	DatabaseConnector dbconn = new DatabaseConnector();
 	List<ItemCategoryDataType> categories = new ArrayList<>();
 	List<StockItemDataType> stockList = new ArrayList<>();
 	StockItemDataType selectedStock = new StockItemDataType();
-	ItemCategoryDataType selectedCategory = new ItemCategoryDataType();
+	String selectedCategory;
+	String SelectedLogin;
 	ItemDataType selectedItem = new ItemDataType();
 	List<LogDataType> userReport = new ArrayList<>();
 
@@ -62,15 +64,27 @@ public class AdminPanelBean {
 	}
 
 	public void addCategory(String Category) {
-		dbconn.AddCategory(Category, Category);
+		if (dbconn.AddCategory(Category, Category))
+			categories = dbconn.getCategories();
 	}
 
 	public void deleteCategory() {
-		dbconn.deleteCategory(selectedCategory.getItemCatID());
+		Iterator<ItemCategoryDataType> itr = categories.iterator();
+		int catid = 0;
+		while (itr.hasNext()) {
+			ItemCategoryDataType temp = itr.next();
+			if (temp.getItemCategory().trim().equals(selectedCategory))
+				catid = temp.getItemCatID();
+		}
+		if (dbconn.deleteCategory(catid)) {
+			categories = dbconn.getCategories();
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "PrimeFaces Rocks."));
+		}
 	}
 
-	public void addStock(String ItemCode, String ItemVariation, String Color,
-						int Stock, double price, String Employee) {
+	public void addStock(String ItemCode, String ItemVariation, String Color, int Stock, double price,
+			String Employee) {
 		if (dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, "ImageName", price, "3"))
 			;
 		dbconn.addUserHistory(Employee, ItemCode, ItemVariation, Stock, "", "NEWITEM", 0);
@@ -91,11 +105,21 @@ public class AdminPanelBean {
 	}
 
 	public void addUser(String Username, String Password) {
-		dbconn.addLogin(Username, Password);
+		if(dbconn.addLogin(Username, Password))
+			loginsList = dbconn.getLogins_all();
 	}
 
 	public void removeUser() {
-		dbconn.removeLogin(selectedLogin.getUserID());
+		Iterator<Logins> itr = loginsList.iterator();
+		int userid = 0;
+		while (itr.hasNext()) {
+			Logins temp = itr.next();
+			if (temp.getUsername().trim().equals(SelectedLogin))
+				;
+			userid = temp.getUserID();
+		}
+		if(dbconn.removeLogin(userid))
+			loginsList = dbconn.getLogins_all();
 	}
 
 	public void addStockQuantity(int Quantity, String Employee) {
@@ -198,16 +222,6 @@ public class AdminPanelBean {
 		this.loginsList = loginsList;
 	}
 
-	public Logins getSelectedLogin() {
-		if (selectedLogin == null)
-			return new Logins();
-		return selectedLogin;
-	}
-
-	public void setSelectedLogin(Logins selectedLogin) {
-		this.selectedLogin = selectedLogin;
-	}
-
 	public LogDataType getSelectedHistory() {
 		return selectedHistory;
 	}
@@ -232,12 +246,20 @@ public class AdminPanelBean {
 		this.selectedStock = selectedStock;
 	}
 
-	public ItemCategoryDataType getSelectedCategory() {
+	public String getSelectedCategory() {
 		return selectedCategory;
 	}
 
-	public void setSelectedCategory(ItemCategoryDataType selectedCategory) {
+	public void setSelectedCategory(String selectedCategory) {
 		this.selectedCategory = selectedCategory;
+	}
+
+	public void setSelectedLogin(String selectedLogin) {
+		SelectedLogin = selectedLogin;
+	}
+
+	public String getSelectedLogin() {
+		return SelectedLogin;
 	}
 
 }

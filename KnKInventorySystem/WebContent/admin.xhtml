@@ -11,6 +11,8 @@
 </h:head>
 <h:body>
 	<h:form id="form">
+		<p:messages id="messages" showDetail="true" autoUpdate="true"
+			closable="true" />
 		<p:tabView id="tabview">
 			<p:tab id="stocktab" title="Управление на артикули">
 				<p:panelGrid id="stockpnlgrid" columns="2">
@@ -77,24 +79,28 @@
 								update="form:tabview:stockpnlgrid" />
 						</p:panelGrid>
 					</p:panel>
-					<p:panel header="Управление на категории"
+					<p:panel id="catpanel" header="Управление на категории"
 						style="width:450px;height:280px">
 						<p:panelGrid columns="2">
 							<p:selectOneListbox id="categories"
 								value="#{adminPanelBean.selectedCategory}">
+								<p:ajax event="change" partialSubmit="true" />
 								<f:selectItems value="#{adminPanelBean.categories}" />
 							</p:selectOneListbox>
 							<p:commandButton value="Изтрий"
-								action="#{adminPanelBean.deleteCategory()}" />
+								action="#{adminPanelBean.deleteCategory()}"
+								update="form:tabview:stockpnlgrid" process="@this"
+								partialSubmit="true" />
 							<p:inputText binding="#{newcat}" />
 							<p:commandButton value="Добави"
-								action="#{adminPanelBean.addCategory(newcat.value)}" />
+								action="#{adminPanelBean.addCategory(newcat.value)}"
+								update="form:tabview:stockpnlgrid" />
 						</p:panelGrid>
 					</p:panel>
 				</p:panelGrid>
 			</p:tab>
 			<p:tab id="usermgmtTab" title="Управление на потребители">
-				<p:panelGrid columns="2">
+				<p:panelGrid id="usergrid" columns="2">
 					<p:dataTable id="errorTable" var="errors"
 						value="#{adminPanelBean.historyList}"
 						selection="#{adminPanelBean.selectedHistory}"
@@ -128,7 +134,7 @@
 						Потребител: <p:inputText binding="#{reportInput}" />
 						<p:commandButton value="Отчет"
 							action="#{adminPanelBean.getReport(reportInput.value)}"
-							update="form:tabview:reportpanel" style="margin-left: 10px" />
+							update="form:tabview:usermgmtTab" style="margin-left: 10px" />
 						<p:dataTable id="reportTable" var="report"
 							value="#{adminPanelBean.userReport}" scrollable="true"
 							scrollHeight="350">
@@ -159,21 +165,19 @@
 							<p:selectOneListbox value="#{adminPanelBean.selectedLogin}"
 								scrollHeight="150">
 								<p:ajax event="change" partialSubmit="true"
-									update="form:tabview:loginpanel" />
+									update="form:tabview:usermgmtTab" />
 								<f:selectItems value="#{adminPanelBean.loginsList}" />
 							</p:selectOneListbox>
 							<p:panel>
 								<p:panelGrid columns="2">
-								Потребител <p:inputText
-										value="#{adminPanelBean.selectedLogin.username}"
-										binding="#{addusr}" />
-								Парола <p:inputText
-										value="#{adminPanelBean.selectedLogin.password}"
-										binding="#{addpwd}" />
+								Потребител <p:inputText binding="#{addusr}" />
+								Парола <p:inputText binding="#{addpwd}" />
 									<p:commandButton value="Добави"
-										action="#{adminPanelBean.addUser(addusr.value,addpwd.value)}" />
+										action="#{adminPanelBean.addUser(addusr.value,addpwd.value)}"
+										update="form:tabview:usergrid" />
 									<p:commandButton value="Изтрий"
-										action="#{adminPanelBean.removeUser()}" />
+										action="#{adminPanelBean.removeUser()}"
+										update="form:tabview:usergrid" />
 								</p:panelGrid>
 							</p:panel>
 						</p:panelGrid>

@@ -28,7 +28,6 @@ public class InventoryBean {
 	TreeNode selectedNode = new DefaultTreeNode();
 	LogDataType selectedHistory = new LogDataType();
 
-
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
 			Iterator<LogDataType> itr = historyList.iterator();
@@ -55,7 +54,6 @@ public class InventoryBean {
 	}
 
 	public void search(String ItemCode, String ItemVariation) {
-		System.out.println("Search for : " + ItemCode + " , " + ItemVariation);
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
@@ -79,6 +77,13 @@ public class InventoryBean {
 		stockList = dbconn.SearchStock("", "");
 		categories = dbconn.getCategories();
 		historyList = dbconn.getUserHistory(login);
+		Iterator<LogDataType> itr = historyList.iterator();
+		while (itr.hasNext()) {
+			LogDataType temp = itr.next();
+			String Action = temp.Action.trim();
+			if (!Action.equals("Remove"))
+				itr.remove();
+		}
 		loadTree();
 	}
 
