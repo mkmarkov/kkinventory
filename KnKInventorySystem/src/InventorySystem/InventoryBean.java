@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -27,6 +29,7 @@ public class InventoryBean {
 	ItemDataType selectedItem = new ItemDataType();
 	TreeNode selectedNode = new DefaultTreeNode();
 	LogDataType selectedHistory = new LogDataType();
+	FacesContext context = FacesContext.getCurrentInstance();
 
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
@@ -41,11 +44,12 @@ public class InventoryBean {
 	}
 
 	public void removeStock(String Employee, int Quantity, String OrderDetails) {
-		if (Quantity <= 0)
+		if (Quantity > selectedItem.getItem().getStock()) {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Недостатъчна наличност", ""));
 			return;
-		if (dbconn.RemoveStockQuantity(selectedItem.getItem().ItemID, Quantity))
-			;
-		{
+		}
+		if (dbconn.RemoveStockQuantity(selectedItem.getItem().ItemID, Quantity)) {
 			selectedItem.getItem().Stock -= Quantity;
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
 					Quantity, OrderDetails, "Remove", selectedItem.getItem().ItemID);

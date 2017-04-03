@@ -7,6 +7,7 @@
 <h:head>
 </h:head>
 <h:form id="form">
+	<p:growl id="growl" showDetail="true" autoUpdate="true" />
 	<f:event type="preRenderView"
 		listener="#{inventoryBean.init(login.user)}" />
 	<p:toolbar>
@@ -77,7 +78,7 @@
 			value="#{inventoryBean.historyList}"
 			selection="#{inventoryBean.selectedHistory}" scrollable="true"
 			selectionMode="single" rowKey="#{history.logID}" scrollHeight="350">
-			<p:ajax event="rowSelect" partialSubmit="true"/>
+			<p:ajax event="rowSelect" partialSubmit="true" />
 			<p:column headerText="Код">
 				#{history.itemCode}
 			</p:column>

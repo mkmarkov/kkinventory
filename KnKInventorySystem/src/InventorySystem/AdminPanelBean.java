@@ -34,6 +34,7 @@ public class AdminPanelBean {
 	String SelectedLogin;
 	ItemDataType selectedItem = new ItemDataType();
 	List<LogDataType> userReport = new ArrayList<>();
+	FacesContext context = FacesContext.getCurrentInstance();
 
 	public void init() {
 		if (stockList.isEmpty()) {
@@ -66,10 +67,16 @@ public class AdminPanelBean {
 	public void addCategory(String Category) {
 		if (dbconn.AddCategory(Category, Category))
 			categories = dbconn.getCategories();
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на категория", ""));
+		}
 	}
-	public void clearReport(){
+
+	public void clearReport() {
 		userReport.clear();
 	}
+
 	public void deleteCategory() {
 		Iterator<ItemCategoryDataType> itr = categories.iterator();
 		int catid = 0;
@@ -80,35 +87,51 @@ public class AdminPanelBean {
 		}
 		if (dbconn.deleteCategory(catid)) {
 			categories = dbconn.getCategories();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "PrimeFaces Rocks."));
+		} else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
 		}
 	}
 
 	public void addStock(String ItemCode, String ItemVariation, String Color, int Stock, double price,
 			String Employee) {
 		if (dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, "ImageName", price, "3"))
-			;
-		dbconn.addUserHistory(Employee, ItemCode, ItemVariation, Stock, "", "NEWITEM", 0);
+			dbconn.addUserHistory(Employee, ItemCode, ItemVariation, Stock, "", "NEWITEM", 0);
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
+		}
 		reload();
 	}
 
 	public void deleteStock(String Employee) {
 		if (dbconn.deleteStock(selectedItem.getItem().ItemID))
-			;
-		dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-				selectedItem.getItem().Stock, "", "DELETE", selectedItem.getItem().ItemID);
+			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
+					selectedItem.getItem().Stock, "", "DELETE", selectedItem.getItem().ItemID);
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при изтриване на артикул", ""));
+		}
 		reload();
 	}
 
 	public void approveMarkedError() {
-		if (dbconn.ReturnStock(selectedHistory.ItemID, selectedHistory.Quantity))
+		if (dbconn.ReturnStock(selectedHistory.ItemID, selectedHistory.Quantity)) {
 			dbconn.approveMarkedError(selectedHistory.LogID);
+			reload();
+		} else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при маркиране на грешка", ""));
+		}
 	}
 
 	public void addUser(String Username, String Password) {
-		if(dbconn.addLogin(Username, Password))
+		if (dbconn.addLogin(Username, Password))
 			loginsList = dbconn.getLogins_all();
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на потребител", ""));
+		}
 	}
 
 	public void removeUser() {
@@ -120,15 +143,22 @@ public class AdminPanelBean {
 				;
 			userid = temp.getUserID();
 		}
-		if(dbconn.removeLogin(userid))
+		if (dbconn.removeLogin(userid))
 			loginsList = dbconn.getLogins_all();
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при изтриване на потребител", ""));
+		}
 	}
 
 	public void addStockQuantity(int Quantity, String Employee) {
 		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
-			;
-		dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation, Quantity,
-				"", "Add", selectedItem.getItem().ItemID);
+			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
+					Quantity, "", "Add", selectedItem.getItem().ItemID);
+		else{
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
+		}
 		reload();
 	}
 
@@ -210,10 +240,6 @@ public class AdminPanelBean {
 
 	public List<LogDataType> getHistoryList() {
 		return historyList;
-	}
-
-	public void setHistoryList(List<LogDataType> historyList) {
-		this.historyList = historyList;
 	}
 
 	public List<Logins> getLoginsList() {
