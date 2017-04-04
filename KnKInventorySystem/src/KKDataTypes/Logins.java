@@ -4,11 +4,12 @@ public class Logins {
 	int UserID;
 	String Username;
 	String Password;
-
-	public Logins(int userID, String username, String password) {
+	int AdminPanelEnabled;
+	public Logins(int userID, String username, String password,int AdminPanelEnabled) {
 		UserID = userID;
 		Username = username;
 		Password = password;
+		this.AdminPanelEnabled = AdminPanelEnabled;
 	}
 
 	public Logins() {
@@ -36,6 +37,14 @@ public class Logins {
 
 	public void setPassword(String password) {
 		Password = password;
+	}
+
+	public int getAdminPanelEnabled() {
+		return AdminPanelEnabled;
+	}
+
+	public void setAdminPanelEnabled(int adminPanelEnabled) {
+		AdminPanelEnabled = adminPanelEnabled;
 	}
 
 	@Override

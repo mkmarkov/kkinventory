@@ -30,9 +30,10 @@ public class DatabaseConnector {
 	private final String ReturnStock = "{ call ReturnStock (?,?)}";// ItemID,Quantity
 	private final String getUserHistory_error = "{ call getUserHistory_error }";
 	private final String approveMarkedError = "{ call approveMarkedError (?) }";
-	private final String addLogin = "{ call addLogin (?,?) }";
+	private final String addLogin = "{ call addLogin (?,?,?) }";
 	private final String removeLogin = "{ call removeLogin (?) }";
 	private final String getLogins_all = "{ call getLogins_all }";
+	private final String getRights = "{ call getRights (?) }";
 	Connection conn;
 
 	public void ConnectToDB() {
@@ -46,6 +47,33 @@ public class DatabaseConnector {
 		}
 	}
 
+	public boolean isAdminPanelEnabled(String Employee) {
+		ConnectToDB();
+		try {
+			CallableStatement call = conn.prepareCall(getRights);
+			call.setString(1, Employee);
+			ResultSet rs = call.executeQuery();
+			while (rs.next()) {
+				if (rs.getInt(1) == 1)
+					return true;
+				else
+					return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
+
 	public List<Logins> getLogins_all() {
 		ConnectToDB();
 		List<Logins> temp = new ArrayList<>();
@@ -53,7 +81,8 @@ public class DatabaseConnector {
 			CallableStatement call = conn.prepareCall(getLogins_all);
 			ResultSet rs = call.executeQuery();
 			while (rs.next()) {
-				temp.add(new Logins(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password")));
+				temp.add(new Logins(rs.getInt("UserID"), rs.getString("Username"), rs.getString("Password"),
+						rs.getInt("AdminPanelEnabled")));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -67,12 +96,13 @@ public class DatabaseConnector {
 		return temp;
 	}
 
-	public Boolean addLogin(String Username, String Password) {
+	public Boolean addLogin(String Username, String Password, int AdminPanelEnabled) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(addLogin);
 			call.setString(1, Username);
 			call.setString(2, Password);
+			call.setInt(3, AdminPanelEnabled);
 			call.executeUpdate();
 			if (call.getUpdateCount() >= 1)
 				return true;

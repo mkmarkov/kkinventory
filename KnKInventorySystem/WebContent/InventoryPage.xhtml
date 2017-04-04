@@ -29,7 +29,7 @@
 		</f:facet>
 
 		<f:facet name="right">
-			<p:commandButton value="Администраторски Панел"
+			<p:commandButton value="Администраторски Панел" rendered="#{inventoryBean.adminPanelEnabled}"
 				action="#{navigationHandler.navigateToAdmin()}" />
 			<p:commandButton value="Изход" action="#{login.logout()}" />
 		</f:facet>

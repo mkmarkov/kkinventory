@@ -17,7 +17,7 @@ public class Login implements Serializable {
 	private String pwd;
 	private String msg;
 	private String user;
-
+	private boolean adminPanelEnabled;
 	public String getPwd() {
 		return pwd;
 	}

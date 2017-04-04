@@ -35,6 +35,7 @@ public class AdminPanelBean {
 	ItemDataType selectedItem = new ItemDataType();
 	List<LogDataType> userReport = new ArrayList<>();
 	FacesContext context = FacesContext.getCurrentInstance();
+	public boolean newuser_adminEnabled;
 
 	public void init() {
 		if (stockList.isEmpty()) {
@@ -126,7 +127,12 @@ public class AdminPanelBean {
 	}
 
 	public void addUser(String Username, String Password) {
-		if (dbconn.addLogin(Username, Password))
+		int adminPanelEnabled;
+		if (newuser_adminEnabled)
+			adminPanelEnabled = 1;
+		else
+			adminPanelEnabled = 0;
+		if (dbconn.addLogin(Username, Password, adminPanelEnabled))
 			loginsList = dbconn.getLogins_all();
 		else {
 			context = FacesContext.getCurrentInstance();
@@ -155,7 +161,7 @@ public class AdminPanelBean {
 		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
 					Quantity, "", "Add", selectedItem.getItem().ItemID);
-		else{
+		else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
 		}
@@ -192,6 +198,14 @@ public class AdminPanelBean {
 
 	public List<ItemCategoryDataType> getCategories() {
 		return categories;
+	}
+
+	public boolean isNewuser_adminEnabled() {
+		return newuser_adminEnabled;
+	}
+
+	public void setNewuser_adminEnabled(boolean newuser_adminEnabled) {
+		this.newuser_adminEnabled = newuser_adminEnabled;
 	}
 
 	public List<LogDataType> getUserReport() {

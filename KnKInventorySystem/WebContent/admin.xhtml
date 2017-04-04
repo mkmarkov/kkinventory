@@ -179,7 +179,7 @@
 
 					</p:panel>
 					<p:panel id="loginpanel">
-						<p:panelGrid columns="2">
+						<p:panelGrid columns="3">
 							<p:selectOneListbox value="#{adminPanelBean.selectedLogin}"
 								scrollHeight="150">
 								<p:ajax event="change" partialSubmit="true"
@@ -198,6 +198,10 @@
 										update="form:tabview:usergrid" />
 								</p:panelGrid>
 							</p:panel>
+							<p:panelGrid columns="2">
+							Администраторски Достъп
+							<p:selectBooleanCheckbox value="#{adminPanelBean.newuser_adminEnabled}"/>
+							</p:panelGrid>
 						</p:panelGrid>
 					</p:panel>
 				</p:panelGrid>

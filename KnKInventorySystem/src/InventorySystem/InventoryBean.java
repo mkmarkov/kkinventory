@@ -30,6 +30,7 @@ public class InventoryBean {
 	TreeNode selectedNode = new DefaultTreeNode();
 	LogDataType selectedHistory = new LogDataType();
 	FacesContext context = FacesContext.getCurrentInstance();
+	boolean adminPanelEnabled = false;;
 
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
@@ -88,7 +89,16 @@ public class InventoryBean {
 			if (!Action.equals("Remove"))
 				itr.remove();
 		}
+		adminPanelEnabled = dbconn.isAdminPanelEnabled(login);
 		loadTree();
+	}
+
+	public boolean isAdminPanelEnabled() {
+		return adminPanelEnabled;
+	}
+
+	public void setAdminPanelEnabled(boolean adminPanelEnabled) {
+		this.adminPanelEnabled = adminPanelEnabled;
 	}
 
 	public void loadTree() {
