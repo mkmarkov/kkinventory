@@ -8,7 +8,8 @@ import java.sql.SQLException;
 
 public class LoginDAO {
 	private final static String getLogins = "{call getLogins (?,?) }";
-	
+	private final static String getRights = "{ call getRights (?) }";
+
 	public static boolean validate(String user, String password) {
 		Connection con = null;
 		CallableStatement ps = null;
@@ -32,4 +33,33 @@ public class LoginDAO {
 		}
 		return false;
 	}
+	
+	public static boolean isAdminPanelEnabled(String Employee) {
+		Connection con = null;
+		try {
+			con = DataConnect.getConnection();
+			CallableStatement call = con.prepareCall(getRights);
+			call.setString(1, Employee);
+			ResultSet rs = call.executeQuery();
+			while (rs.next()) {
+				if (rs.getInt(1) == 1)
+					return true;
+				else
+					return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+
+		} finally {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
+
 }

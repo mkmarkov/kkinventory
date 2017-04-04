@@ -46,8 +46,10 @@ public class Login implements Serializable {
 	public String validateUsernamePassword() {
 		boolean valid = LoginDAO.validate(user, pwd);
 		if (valid) {
+			adminPanelEnabled = LoginDAO.isAdminPanelEnabled(user);
 			HttpSession session = SessionUtils.getSession();
 			session.setAttribute("username", user);
+			session.setAttribute("adminEnabled", adminPanelEnabled);
 			return "OK";
 		} else {
 			FacesContext.getCurrentInstance().addMessage(

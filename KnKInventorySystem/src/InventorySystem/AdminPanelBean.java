@@ -17,6 +17,7 @@ import KKDataTypes.ItemDataType;
 import KKDataTypes.LogDataType;
 import KKDataTypes.Logins;
 import KKDataTypes.StockItemDataType;
+import login.SessionUtils;
 
 @ManagedBean
 @SessionScoped
@@ -38,6 +39,7 @@ public class AdminPanelBean {
 	public boolean newuser_adminEnabled;
 
 	public void init() {
+		if(SessionUtils.getAdminPanelRights().equals(1))
 		if (stockList.isEmpty()) {
 			historyList = dbconn.getUserHistory_error();
 			loginsList = dbconn.getLogins_all();
@@ -48,6 +50,8 @@ public class AdminPanelBean {
 			categories = dbconn.getCategories();
 			loadTree();
 		}
+		else
+			SessionUtils.getSession().invalidate();
 	}
 
 	public void reload() {

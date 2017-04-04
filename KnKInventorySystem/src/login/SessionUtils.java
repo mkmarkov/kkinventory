@@ -29,4 +29,12 @@ public class SessionUtils {
 		else
 			return null;
 	}
+	
+	public static String getAdminPanelRights(){
+		HttpSession session = getSession();
+		if (session != null)
+			return (String) session.getAttribute("adminEnabled");
+		else
+			return null;
+	}
 }

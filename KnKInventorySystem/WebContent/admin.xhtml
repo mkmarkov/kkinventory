@@ -21,7 +21,7 @@
 			</f:facet>
 
 			<f:facet name="right">
-				<p:commandButton value="Инвентар" type="button"
+				<p:commandButton value="Инвентар"
 					action="#{navigationHandler.navigateToInventory()}" />
 				<p:commandButton value="Изход" action="#{login.logout()}" />
 			</f:facet>
@@ -200,7 +200,8 @@
 							</p:panel>
 							<p:panelGrid columns="2">
 							Администраторски Достъп
-							<p:selectBooleanCheckbox value="#{adminPanelBean.newuser_adminEnabled}"/>
+							<p:selectBooleanCheckbox
+									value="#{adminPanelBean.newuser_adminEnabled}" />
 							</p:panelGrid>
 						</p:panelGrid>
 					</p:panel>

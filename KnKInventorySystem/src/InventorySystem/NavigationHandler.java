@@ -10,7 +10,7 @@ public class NavigationHandler {
 
 	public String navigateToAdmin() {
 		try {
-			FacesContext.getCurrentInstance().getExternalContext().redirect("\\admin.xhtml");
+			FacesContext.getCurrentInstance().getExternalContext().redirect("/KnKInventorySystem/faces/admin.xhtml");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -19,7 +19,7 @@ public class NavigationHandler {
 
 	public String navigateToInventory() {
 		try {
-			FacesContext.getCurrentInstance().getExternalContext().redirect("\\InventoryPage.xhtml");
+			FacesContext.getCurrentInstance().getExternalContext().redirect("/KnKInventorySystem/faces/InventoryPage.xhtml");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
