@@ -30,11 +30,11 @@ public class SessionUtils {
 			return null;
 	}
 	
-	public static String getAdminPanelRights(){
+	public static boolean getAdminPanelRights(){
 		HttpSession session = getSession();
 		if (session != null)
-			return (String) session.getAttribute("adminEnabled");
+			return (boolean) session.getAttribute("adminEnabled");
 		else
-			return null;
+			return false;
 	}
 }

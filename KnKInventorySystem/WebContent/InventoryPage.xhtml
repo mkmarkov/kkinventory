@@ -5,31 +5,35 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
+
 </h:head>
 <h:form id="form">
+
 	<p:growl id="growl" showDetail="true" autoUpdate="true" />
 	<f:event type="preRenderView"
 		listener="#{inventoryBean.init(login.user)}" />
 	<p:toolbar>
-		<f:facet name="left">
+		<f:facet name="left" >
 				Добре дошли, #{login.user}
 				<span class="ui-separator"> <span
 				class="ui-icon ui-icon-grip-dotted-vertical" />
 			</span>
 				Код: 
-				<h:inputText binding="#{code}" style="margin-left: 10px" />
+				<p:inputText binding="#{code}" style="margin-left: 10px" />
 				Вариация:
-				<h:inputText binding="#{variation}" style="margin-left: 10px" />
+				<p:inputText binding="#{variation}" style="margin-left: 10px" />
+				Наличност
+				<p:inputText binding="#{search_qty}" type="number"
+				style="margin-left: 10px" />
 			<p:commandButton value="Търси"
-				action="#{inventoryBean.search(code.value,variation.value)}"
+				action="#{inventoryBean.search(code.value,variation.value,search_qty.value)}"
 				update="form:stocktable" style="margin-left: 10px" />
 			<p:commandButton value="test" action="#{inventoryBean.init()}"
 				update="form:stocktable" style="margin-left: 10px" rendered="false" />
-
 		</f:facet>
-
 		<f:facet name="right">
-			<p:commandButton value="Администраторски Панел" rendered="#{inventoryBean.adminPanelEnabled}"
+			<p:commandButton value="Администраторски Панел"
+				rendered="#{inventoryBean.adminPanelEnabled}"
 				action="#{navigationHandler.navigateToAdmin()}" />
 			<p:commandButton value="Изход" action="#{login.logout()}" />
 		</f:facet>
@@ -39,7 +43,7 @@
 		rowKey="#{stock.itemID}" scrollable="true" scrollHeight="450">
 		<p:ajax event="select" listener="#{inventoryBean.setselected()}"
 			update="form:removestockpanel" />
-		<p:column headerText="Категория">
+		<p:column headerText="Категория" styleClass="togglerClass">
 			#{stock.cat.itemCategory}
 			 	</p:column>
 		<p:column headerText="Код">
@@ -47,6 +51,9 @@
 			 	</p:column>
 		<p:column headerText="Вариация">
 			#{stock.item.itemVariation}
+			 	</p:column>
+		<p:column headerText="Цвят">
+			#{stock.item.color}
 			 	</p:column>
 		<p:column headerText="Наличност">
 			#{stock.item.stock}
@@ -69,7 +76,7 @@
 		Детайли за поръчката
 		<p:inputText binding="#{orderDetail}" />
 		Количество
-		<p:inputText binding="#{qty}" />
+		<p:inputText binding="#{qty}" type="number" />
 			<p:commandButton value="Отметни"
 				action="#{inventoryBean.removeStock(login.user,qty.value,orderDetail.value)}"
 				update="historyTable,form:stocktable" />

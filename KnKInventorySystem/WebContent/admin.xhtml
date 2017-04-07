@@ -6,7 +6,7 @@
 <h:head>
 	<title>login</title>
 	<f:metadata>
-		<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
+		<f:event type="preRenderView" listener="#{adminPanelBean.init()}"/>
 	</f:metadata>
 </h:head>
 <h:body>
@@ -46,6 +46,9 @@
 						<p:column headerText="Вариация">
 			#{stock.item.itemVariation}
 			 	</p:column>
+						<p:column headerText="Цвят">
+			#{stock.item.color}
+			 	</p:column>
 						<p:column headerText="Наличност">
 			#{stock.item.stock}
 			 	</p:column>
@@ -66,7 +69,7 @@
 		<p:inputText value="#{adminPanelBean.selectedItem.item.stock}"
 								readonly="true" disabled="true" />
 		Количество
-		<p:inputText binding="#{qty}" />
+		<p:inputText binding="#{qty}" type="number" />
 							<p:commandButton value="Добави"
 								action="#{adminPanelBean.addStockQuantity(qty.value,login.user)}"
 								update="form:tabview:stockpnlgrid" />
@@ -80,18 +83,24 @@
 						style="width:450px">
 						<p:panelGrid columns="2">
 		Код
-		<p:inputText binding="#{code_addItem}" />
+		<p:inputText value="#{adminPanelBean.newitem.itemCode}" />
 		Вариация
-		<p:inputText binding="#{var_addItem}" />
+		<p:inputText value="#{adminPanelBean.newitem.itemVariation}" />
+		Категория
+		<p:selectOneMenu value="#{adminPanelBean.newitem.itemCategory}">
+								<f:selectItems value="#{adminPanelBean.categories}" />
+							</p:selectOneMenu>
 		Цвят
-		<p:inputText binding="#{color_addItem}" />
+		<p:inputText value="#{adminPanelBean.newitem.color}" />
 		Цена
-		<p:inputText binding="#{price_addItem}" />
+		<p:inputNumber value="#{adminPanelBean.newitem.price}" />
 		Наличност
-		<p:inputText binding="#{qty_addItem}" />
+		<p:inputText value="#{adminPanelBean.newitem.stock}" type="number" />
 							<p:commandButton value="Добави	"
-								action="#{adminPanelBean.addStock(code_addItem.value,var_addItem.value,color_addItem.value,qty_addItem.value,price_addItem.value,login.user)}"
+								action="#{adminPanelBean.addStock()}"
 								update="form:tabview:stockpnlgrid" />
+							<p:fileUpload value="#{adminPanelBean.file}" fileUploadListener="#{adminPanelBean.upload}"
+							auto="true" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced" skinSimple="true"/>
 						</p:panelGrid>
 					</p:panel>
 					<p:panel id="catpanel" header="Управление на категории"
@@ -115,6 +124,7 @@
 				</p:panelGrid>
 			</p:tab>
 			<p:tab id="usermgmtTab" title="Управление на потребители">
+				
 				<p:panelGrid id="usergrid" columns="2">
 					<p:dataTable id="errorTable" var="errors"
 						value="#{adminPanelBean.historyList}"
@@ -182,8 +192,6 @@
 						<p:panelGrid columns="3">
 							<p:selectOneListbox value="#{adminPanelBean.selectedLogin}"
 								scrollHeight="150">
-								<p:ajax event="change" partialSubmit="true"
-									update="form:tabview:usermgmtTab" />
 								<f:selectItems value="#{adminPanelBean.loginsList}" />
 							</p:selectOneListbox>
 							<p:panel>

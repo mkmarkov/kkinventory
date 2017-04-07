@@ -58,11 +58,11 @@ public class InventoryBean {
 		historyList = dbconn.getUserHistory(Employee);
 	}
 
-	public void search(String ItemCode, String ItemVariation) {
+	public void search(String ItemCode, String ItemVariation,int qty) {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock(ItemCode, ItemVariation);
+		stockList = dbconn.SearchStock(ItemCode, ItemVariation,qty);
 		categories = dbconn.getCategories();
 		loadTree();
 	}
@@ -73,13 +73,15 @@ public class InventoryBean {
 
 	public void setselected() {
 		selectedItem = (ItemDataType) selectedNode.getData();
+		selectedNode.setExpanded(true);
 	}
 
 	public void init(String login) {
+		if(stockList.isEmpty()){
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock("", "");
+		stockList = dbconn.SearchStock("", "",0);
 		categories = dbconn.getCategories();
 		historyList = dbconn.getUserHistory(login);
 		Iterator<LogDataType> itr = historyList.iterator();
@@ -91,6 +93,7 @@ public class InventoryBean {
 		}
 		adminPanelEnabled = dbconn.isAdminPanelEnabled(login);
 		loadTree();
+		}
 	}
 
 	public boolean isAdminPanelEnabled() {
@@ -102,6 +105,7 @@ public class InventoryBean {
 	}
 
 	public void loadTree() {
+		root.getChildren().clear();
 		Iterator<ItemCategoryDataType> catItr = categories.iterator();
 		while (catItr.hasNext()) {
 			ItemCategoryDataType temp = catItr.next();

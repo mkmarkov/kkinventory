@@ -1,5 +1,11 @@
 package InventorySystem;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,8 +15,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.io.FilenameUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 
 import KKDataTypes.ItemCategoryDataType;
 import KKDataTypes.ItemDataType;
@@ -36,22 +45,24 @@ public class AdminPanelBean {
 	ItemDataType selectedItem = new ItemDataType();
 	List<LogDataType> userReport = new ArrayList<>();
 	FacesContext context = FacesContext.getCurrentInstance();
+	StockItemDataType newitem = new StockItemDataType();
 	public boolean newuser_adminEnabled;
 
 	public void init() {
-		if(SessionUtils.getAdminPanelRights().equals(1))
+		if (!SessionUtils.getAdminPanelRights()) {
+			SessionUtils.getSession().invalidate();
+			return;
+		}
 		if (stockList.isEmpty()) {
 			historyList = dbconn.getUserHistory_error();
 			loginsList = dbconn.getLogins_all();
 			stockList.clear();
 			categories.clear();
 			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "");
+			stockList = dbconn.SearchStock("", "", 0);
 			categories = dbconn.getCategories();
 			loadTree();
 		}
-		else
-			SessionUtils.getSession().invalidate();
 	}
 
 	public void reload() {
@@ -60,7 +71,7 @@ public class AdminPanelBean {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock("", "");
+		stockList = dbconn.SearchStock("", "", 0);
 		categories = dbconn.getCategories();
 		loadTree();
 	}
@@ -98,10 +109,11 @@ public class AdminPanelBean {
 		}
 	}
 
-	public void addStock(String ItemCode, String ItemVariation, String Color, int Stock, double price,
-			String Employee) {
-		if (dbconn.AddStock(ItemCode, ItemVariation, Color, Stock, "ImageName", price, "3"))
-			dbconn.addUserHistory(Employee, ItemCode, ItemVariation, Stock, "", "NEWITEM", 0);
+	public void addStock() {
+		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, "ImageName",
+				newitem.price, newitem.ItemCategory))
+			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation, newitem.Stock,
+					"", "NEWITEM", 0);
 		else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
@@ -198,10 +210,34 @@ public class AdminPanelBean {
 		selectedItem = (ItemDataType) selectedNode.getData();
 	}
 
+	public void upload(FileUploadEvent event) {
+		try {
+			UploadedFile uploadedFile = event.getFile();
+			InputStream input = uploadedFile.getInputstream();
+			Path folder = Paths.get("C:\\Users\\mkmarkov\\Desktop");
+			String filename = FilenameUtils.getBaseName(uploadedFile.getFileName());
+			String extension = FilenameUtils.getExtension(uploadedFile.getFileName());
+			Path file = Files.createTempFile(folder, filename + "-", "." + extension);
+			input = uploadedFile.getInputstream();
+			Files.copy(input, file, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("Uploaded file successfully saved in " + file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	///////////////////////////////////////////////////
 
 	public List<ItemCategoryDataType> getCategories() {
 		return categories;
+	}
+
+	public StockItemDataType getNewitem() {
+		return newitem;
+	}
+
+	public void setNewitem(StockItemDataType newitem) {
+		this.newitem = newitem;
 	}
 
 	public boolean isNewuser_adminEnabled() {

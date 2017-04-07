@@ -15,7 +15,7 @@ import KKDataTypes.StockItemDataType;
 
 public class DatabaseConnector {
 
-	private final String GetStockJDBCCall = "{ call getStock (?,?)}"; // ItemCode,ItemVariation
+	private final String GetStockJDBCCall = "{ call getStock (?,?,?)}"; // ItemCode,ItemVariation,Qty
 	private final String AddStockJDBCCall = "{ call addStock (?,?,?,?,?,?,?)}"; // ItemCode,ItemVariation,Color,Stock,ImageName,ItemCatID,price
 	private final String deleteStock = "{ call deleteStock (?) }"; // ItemID;
 	private final String AddStockQuantityJDBCCall = "{ call addStockQuantity (?,?)}"; // ItemID,Quantity
@@ -427,7 +427,7 @@ public class DatabaseConnector {
 			call.setString(3, Color);
 			call.setInt(4, Stock);
 			call.setString(5, ImageName);
-			call.setFloat(6, (float) price);
+			call.setDouble(6, price);
 			call.setString(7, ItemCategory);
 			call.executeUpdate();
 			if (call.getUpdateCount() >= 1)
@@ -469,18 +469,19 @@ public class DatabaseConnector {
 		return list;
 	}
 
-	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation) {
+	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation,int qty) {
 		ConnectToDB();
 		List<StockItemDataType> list = new ArrayList<>();
 		try {
 			CallableStatement call = conn.prepareCall(GetStockJDBCCall);
 			call.setString(1, ItemCode);
 			call.setString(2, ItemVariation);
+			call.setInt(3, qty);
 			ResultSet rs = call.executeQuery();
 
 			while (rs.next()) {
 				StockItemDataType temp = new StockItemDataType(rs.getString("ItemCode"), rs.getString("ItemVariation"),
-						rs.getString("Color"), rs.getInt("Stock"), rs.getFloat("Price"), rs.getInt("ItemID"),
+						rs.getString("Color"), rs.getInt("Stock"), rs.getDouble("Price"), rs.getInt("ItemID"),
 						rs.getString("ItemCatеgory"), rs.getString("ImageName"));
 				list.add(temp);
 			}
