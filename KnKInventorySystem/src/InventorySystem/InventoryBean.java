@@ -31,6 +31,7 @@ public class InventoryBean {
 	LogDataType selectedHistory = new LogDataType();
 	FacesContext context = FacesContext.getCurrentInstance();
 	boolean adminPanelEnabled = false;;
+	private boolean expandTable = false;
 
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
@@ -54,16 +55,19 @@ public class InventoryBean {
 			selectedItem.getItem().Stock -= Quantity;
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
 					Quantity, OrderDetails, "Remove", selectedItem.getItem().ItemID);
+			ItemDataType parent = (ItemDataType) selectedNode.getParent().getData();
+			parent.getItem().Stock -= Quantity;
 		}
 		historyList = dbconn.getUserHistory(Employee);
 	}
 
-	public void search(String ItemCode, String ItemVariation,int qty) {
+	public void search(String ItemCode, String ItemVariation, int qty) {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock(ItemCode, ItemVariation,qty);
+		stockList = dbconn.SearchStock(ItemCode, ItemVariation, qty);
 		categories = dbconn.getCategories();
+		expandTable = true;
 		loadTree();
 	}
 
@@ -77,22 +81,22 @@ public class InventoryBean {
 	}
 
 	public void init(String login) {
-		if(stockList.isEmpty()){
-		stockList.clear();
-		categories.clear();
-		root.getChildren().clear();
-		stockList = dbconn.SearchStock("", "",0);
-		categories = dbconn.getCategories();
-		historyList = dbconn.getUserHistory(login);
-		Iterator<LogDataType> itr = historyList.iterator();
-		while (itr.hasNext()) {
-			LogDataType temp = itr.next();
-			String Action = temp.Action.trim();
-			if (!Action.equals("Remove"))
-				itr.remove();
-		}
-		adminPanelEnabled = dbconn.isAdminPanelEnabled(login);
-		loadTree();
+		if (stockList.isEmpty()) {
+			stockList.clear();
+			categories.clear();
+			root.getChildren().clear();
+			stockList = dbconn.SearchStock("", "", 0);
+			categories = dbconn.getCategories();
+			historyList = dbconn.getUserHistory(login);
+			Iterator<LogDataType> itr = historyList.iterator();
+			while (itr.hasNext()) {
+				LogDataType temp = itr.next();
+				String Action = temp.Action.trim();
+				if (!Action.equals("Remove"))
+					itr.remove();
+			}
+			adminPanelEnabled = dbconn.isAdminPanelEnabled(login);
+			loadTree();
 		}
 	}
 
@@ -105,13 +109,17 @@ public class InventoryBean {
 	}
 
 	public void loadTree() {
+
 		root.getChildren().clear();
 		Iterator<ItemCategoryDataType> catItr = categories.iterator();
 		while (catItr.hasNext()) {
 			ItemCategoryDataType temp = catItr.next();
 			root.getChildren().add(new DefaultTreeNode(
 					new ItemDataType(temp.getItemCatID(), temp.getItemCategory(), temp.getItemSubcategory())));
+			if (expandTable)
+				root.getChildren().get(root.getChildren().size()-1).setExpanded(true);
 		}
+
 		Iterator<StockItemDataType> itr = stockList.iterator();
 		while (itr.hasNext()) {
 			StockItemDataType temp = itr.next();
@@ -124,6 +132,23 @@ public class InventoryBean {
 							temp.ItemCode, temp.ItemVariation, temp.Color, temp.price, temp.Stock, temp.ImageName)));
 				}
 			}
+		}
+		calculateTotalStock();
+		expandTable = false;
+	}
+
+	public void calculateTotalStock() {
+		Iterator<TreeNode> itr = root.getChildren().iterator();
+		while (itr.hasNext()) {
+			int sum = 0;
+			TreeNode currNode = itr.next();
+			ItemDataType currCat = (ItemDataType) currNode.getData();
+			Iterator<TreeNode> catItr = currNode.getChildren().iterator();
+			while (catItr.hasNext()) {
+				ItemDataType currItem = (ItemDataType) catItr.next().getData();
+				sum += currItem.getItem().Stock;
+			}
+			currCat.getItem().setStock(sum);
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////

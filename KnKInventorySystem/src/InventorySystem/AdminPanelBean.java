@@ -1,6 +1,5 @@
 package InventorySystem;
 
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +46,7 @@ public class AdminPanelBean {
 	FacesContext context = FacesContext.getCurrentInstance();
 	StockItemDataType newitem = new StockItemDataType();
 	public boolean newuser_adminEnabled;
-
+	private String newItem_imageName="";
 	public void init() {
 		if (!SessionUtils.getAdminPanelRights()) {
 			SessionUtils.getSession().invalidate();
@@ -110,7 +109,7 @@ public class AdminPanelBean {
 	}
 
 	public void addStock() {
-		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, "ImageName",
+		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
 				newitem.price, newitem.ItemCategory))
 			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation, newitem.Stock,
 					"", "NEWITEM", 0);
@@ -118,6 +117,7 @@ public class AdminPanelBean {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
 		}
+		newitem = new StockItemDataType();
 		reload();
 	}
 
@@ -204,21 +204,38 @@ public class AdminPanelBean {
 				}
 			}
 		}
+		calculateTotalStock();
 	}
 
 	public void setselected() {
 		selectedItem = (ItemDataType) selectedNode.getData();
 	}
 
+	public void calculateTotalStock() {
+		Iterator<TreeNode> itr = root.getChildren().iterator();
+		while (itr.hasNext()) {
+			int sum = 0;
+			TreeNode currNode = itr.next();
+			ItemDataType currCat = (ItemDataType) currNode.getData();
+			Iterator<TreeNode> catItr = currNode.getChildren().iterator();
+			while (catItr.hasNext()) {
+				ItemDataType currItem = (ItemDataType) catItr.next().getData();
+				sum += currItem.getItem().Stock;
+			}
+			currCat.getItem().setStock(sum);
+		}
+	}
+
 	public void upload(FileUploadEvent event) {
 		try {
 			UploadedFile uploadedFile = event.getFile();
 			InputStream input = uploadedFile.getInputstream();
-			Path folder = Paths.get("C:\\Users\\mkmarkov\\Desktop");
+			Path folder = Paths.get("C:\\Tomcat9\\webapps\\KKSport\\Images");
 			String filename = FilenameUtils.getBaseName(uploadedFile.getFileName());
 			String extension = FilenameUtils.getExtension(uploadedFile.getFileName());
-			Path file = Files.createTempFile(folder, filename + "-", "." + extension);
+			Path file = Files.createTempFile(folder, filename, "." + extension);
 			input = uploadedFile.getInputstream();
+			newItem_imageName = file.getFileName().toString();
 			Files.copy(input, file, StandardCopyOption.REPLACE_EXISTING);
 			System.out.println("Uploaded file successfully saved in " + file);
 		} catch (Exception e) {

@@ -5,15 +5,14 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
-
 </h:head>
-<h:form id="form">
+<h:form id="form" style="font-size:0.9em">
 
 	<p:growl id="growl" showDetail="true" autoUpdate="true" />
 	<f:event type="preRenderView"
 		listener="#{inventoryBean.init(login.user)}" />
 	<p:toolbar>
-		<f:facet name="left" >
+		<f:facet name="left">
 				Добре дошли, #{login.user}
 				<span class="ui-separator"> <span
 				class="ui-icon ui-icon-grip-dotted-vertical" />
@@ -61,6 +60,14 @@
 		<p:column headerText="Цена">
 			#{stock.item.price}
 			 	</p:column>
+		<p:column style="width:32px;text-align: center">
+			<p:commandButton update=":form:imagePanel"
+				oncomplete="PF('imageDialog').show()" icon="ui-icon-search"
+				title="View">
+				<f:setPropertyActionListener value="#{Stock}"
+					target="#{inventoryBean.selectedItem}" />
+			</p:commandButton>
+		</p:column>
 	</p:treeTable>
 	<p:panelGrid columns="2">
 		<p:panel id="removestockpanel">
@@ -108,5 +115,18 @@
 			</f:facet>
 		</p:dataTable>
 	</p:panelGrid>
+	<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog" resizable="false" size="300">
+		 <p:graphicImage name="KKSport/Images/#{inventoryBean.selectedItem.item.imageName}"/>
+			<p:panelGrid columns="2">
+				Код:
+				<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
+				Вариация:
+				<h:outputText value="#{inventoryBean.selectedItem.item.itemVariation}" />
+				Цвят:
+				<h:outputText vallue="#{inventoryBean.selectedItem.item.color}"/>
+				Категория:
+				<h:outputText value="#{inventoryBean.selectedItem.item.itemCategory}" />
+			</p:panelGrid>
+	</p:dialog>
 </h:form>
 </html>
