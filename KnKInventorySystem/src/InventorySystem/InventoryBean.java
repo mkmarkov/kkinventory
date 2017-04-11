@@ -1,5 +1,8 @@
 package InventorySystem;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,8 +11,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
 
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 
 import KKDataTypes.ItemCategoryDataType;
@@ -117,7 +123,7 @@ public class InventoryBean {
 			root.getChildren().add(new DefaultTreeNode(
 					new ItemDataType(temp.getItemCatID(), temp.getItemCategory(), temp.getItemSubcategory())));
 			if (expandTable)
-				root.getChildren().get(root.getChildren().size()-1).setExpanded(true);
+				root.getChildren().get(root.getChildren().size() - 1).setExpanded(true);
 		}
 
 		Iterator<StockItemDataType> itr = stockList.iterator();
@@ -149,6 +155,22 @@ public class InventoryBean {
 				sum += currItem.getItem().Stock;
 			}
 			currCat.getItem().setStock(sum);
+		}
+	}
+
+	public StreamedContent getImage() throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+			// So, we're rendering the view. Return a stub StreamedContent so
+			// that it will generate right URL.
+			return new DefaultStreamedContent();
+		} else {
+			// So, browser is requesting the image. Return a real
+			// StreamedContent with the image bytes.
+			String filename = context.getExternalContext().getRequestParameterMap().get("filename");
+			return new DefaultStreamedContent(
+					new FileInputStream(new File("C:\\KKSport\\Images", selectedItem.getItem().ImageName)));
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////

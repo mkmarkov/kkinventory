@@ -1,5 +1,8 @@
 package InventorySystem;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,10 +16,13 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
 
 import org.apache.commons.io.FilenameUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
 
@@ -242,7 +248,22 @@ public class AdminPanelBean {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public StreamedContent getImage() throws IOException {
+	    FacesContext context = FacesContext.getCurrentInstance();
 
+	    if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+	        // So, we're rendering the view. Return a stub StreamedContent so that it will generate right URL.
+	        return new DefaultStreamedContent();
+	    }
+	    else {
+	        // So, browser is requesting the image. Return a real StreamedContent with the image bytes.
+	        String filename = context.getExternalContext().getRequestParameterMap().get("filename");
+	        return new DefaultStreamedContent(new FileInputStream(new File("C:\\KKSport\\Images", selectedItem.getItem().ImageName)));
+	    }
+	}
+	
 	///////////////////////////////////////////////////
 
 	public List<ItemCategoryDataType> getCategories() {

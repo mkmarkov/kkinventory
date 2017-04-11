@@ -115,18 +115,23 @@
 			</f:facet>
 		</p:dataTable>
 	</p:panelGrid>
-	<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog" resizable="false" size="300">
-		 <p:graphicImage name="KKSport/Images/#{inventoryBean.selectedItem.item.imageName}"/>
-			<p:panelGrid columns="2">
+	<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog"
+		resizable="false" size="300">
+		<p:graphicImage value="#{inventoryBean.image}">
+			<f:param name="filename" value="#{inventoryBean.selectedItem.item.imageName}" height="200" width="200" />
+		</p:graphicImage>
+		<p:panelGrid columns="2">
 				Код:
 				<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
 				Вариация:
-				<h:outputText value="#{inventoryBean.selectedItem.item.itemVariation}" />
+				<h:outputText
+				value="#{inventoryBean.selectedItem.item.itemVariation}" />
 				Цвят:
-				<h:outputText vallue="#{inventoryBean.selectedItem.item.color}"/>
+				<h:outputText vallue="#{inventoryBean.selectedItem.item.color}" />
 				Категория:
-				<h:outputText value="#{inventoryBean.selectedItem.item.itemCategory}" />
-			</p:panelGrid>
+				<h:outputText
+				value="#{inventoryBean.selectedItem.item.itemCategory}" />
+		</p:panelGrid>
 	</p:dialog>
 </h:form>
 </html>
