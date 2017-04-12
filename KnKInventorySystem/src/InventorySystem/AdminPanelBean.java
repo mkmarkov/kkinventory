@@ -1,13 +1,10 @@
 package InventorySystem;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,14 +14,16 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import javax.imageio.ImageIO;
 
-import org.apache.commons.io.FilenameUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
+
+import com.mortennobel.imagescaling.ResampleOp;
 
 import KKDataTypes.ItemCategoryDataType;
 import KKDataTypes.ItemDataType;
@@ -115,6 +114,13 @@ public class AdminPanelBean {
 	}
 
 	public void addStock() {
+		if(newitem.ItemCode.isEmpty() || newitem.ItemCode.trim().length()==0)
+		{
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
+			return;
+		}
+		
 		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
 				newitem.price, newitem.ItemCategory))
 			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation, newitem.Stock,
@@ -235,15 +241,13 @@ public class AdminPanelBean {
 	public void upload(FileUploadEvent event) {
 		try {
 			UploadedFile uploadedFile = event.getFile();
+			ResampleOp resample = new ResampleOp(300, 300);
 			InputStream input = uploadedFile.getInputstream();
-			Path folder = Paths.get("C:\\Tomcat9\\webapps\\KKSport\\Images");
-			String filename = FilenameUtils.getBaseName(uploadedFile.getFileName());
-			String extension = FilenameUtils.getExtension(uploadedFile.getFileName());
-			Path file = Files.createTempFile(folder, filename, "." + extension);
-			input = uploadedFile.getInputstream();
-			newItem_imageName = file.getFileName().toString();
-			Files.copy(input, file, StandardCopyOption.REPLACE_EXISTING);
-			System.out.println("Uploaded file successfully saved in " + file);
+			BufferedImage image = ImageIO.read(input);
+			input.close();
+			image = resample.filter(image, null);
+			newItem_imageName =uploadedFile.getFileName();
+			ImageIO.write(image, "jpg", new File("C:\\KKSport\\Images\\" + uploadedFile.getFileName()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -254,12 +258,9 @@ public class AdminPanelBean {
 	    FacesContext context = FacesContext.getCurrentInstance();
 
 	    if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-	        // So, we're rendering the view. Return a stub StreamedContent so that it will generate right URL.
 	        return new DefaultStreamedContent();
 	    }
 	    else {
-	        // So, browser is requesting the image. Return a real StreamedContent with the image bytes.
-	        String filename = context.getExternalContext().getRequestParameterMap().get("filename");
 	        return new DefaultStreamedContent(new FileInputStream(new File("C:\\KKSport\\Images", selectedItem.getItem().ImageName)));
 	    }
 	}

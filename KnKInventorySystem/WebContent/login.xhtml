@@ -9,21 +9,23 @@
 </h:head>
 <h:body>
 	<h:form>
-		<h3>KK Inventory System Login</h3>
-		<h:outputText value="Username" />
-		<h:inputText id="username" value="#{login.user}"></h:inputText>
-		<h:message for="username"></h:message>
-		<br></br>
-		<br></br>
+		<div style="margin: 0 auto;">
+				<h3>KK Inventory System Login</h3>
+				<h:outputText value="Username" />
+				<h:inputText id="username" value="#{login.user}"></h:inputText>
+				<h:message for="username"></h:message>
+				<br></br>
+				<br></br>
 
-		<h:outputText value="Password" />
-		<h:inputSecret id="password" value="#{login.pwd}"></h:inputSecret>
-		<h:message for="password"></h:message>
-		<br></br>
-		<br></br>
+				<h:outputText value="Password" />
+				<h:inputSecret id="password" value="#{login.pwd}"></h:inputSecret>
+				<h:message for="password"></h:message>
+				<br></br>
+				<br></br>
 
-		<h:commandButton action="#{login.validateUsernamePassword}"
-			value="Login"></h:commandButton>
+				<h:commandButton action="#{login.validateUsernamePassword}"
+					value="Login"></h:commandButton>
+		</div>
 	</h:form>
 </h:body>
 </html>
