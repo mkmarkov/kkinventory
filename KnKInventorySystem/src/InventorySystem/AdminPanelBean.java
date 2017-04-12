@@ -239,7 +239,7 @@ public class AdminPanelBean {
 	}
 
 	public void upload(FileUploadEvent event) {
-		try {
+		try { 
 			UploadedFile uploadedFile = event.getFile();
 			ResampleOp resample = new ResampleOp(300, 300);
 			InputStream input = uploadedFile.getInputstream();
