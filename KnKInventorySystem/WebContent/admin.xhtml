@@ -192,6 +192,7 @@
 						<p:panelGrid columns="3">
 							<p:selectOneListbox value="#{adminPanelBean.selectedLogin}"
 								scrollHeight="150">
+								<p:ajax partialSubmit="true" event="change" update="form:tabview:usergrid"/>
 								<f:selectItems value="#{adminPanelBean.loginsList}" />
 							</p:selectOneListbox>
 							<p:panel>

@@ -6,25 +6,26 @@
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
 	<title>login</title>
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{inventoryConfig.init()}" />
+	</f:metadata>
 </h:head>
-<h:body> 
+<h:body>
 	<h:form>
 		<div style="margin: 0 auto;">
-				<h3>KK Inventory System Login</h3>
-				<h:outputText value="Username" />
-				<h:inputText id="username" value="#{login.user}"></h:inputText>
-				<h:message for="username"></h:message>
-				<br></br>
-				<br></br>
+			<h3>KK Inventory System Login</h3>
+			<h:outputText value="Username" />
+			<h:inputText id="username" value="#{login.user}"></h:inputText>
+			<h:message for="username"></h:message>
+			<br></br> <br></br>
 
-				<h:outputText value="Password" />
-				<h:inputSecret id="password" value="#{login.pwd}"></h:inputSecret>
-				<h:message for="password"></h:message>
-				<br></br>
-				<br></br>
+			<h:outputText value="Password" />
+			<h:inputSecret id="password" value="#{login.pwd}"></h:inputSecret>
+			<h:message for="password"></h:message>
+			<br></br> <br></br>
 
-				<h:commandButton action="#{login.validateUsernamePassword}"
-					value="Login"></h:commandButton>
+			<h:commandButton action="#{login.validateUsernamePassword}"
+				value="Login"></h:commandButton>
 		</div>
 	</h:form>
 </h:body>

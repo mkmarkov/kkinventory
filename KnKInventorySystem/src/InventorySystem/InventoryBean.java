@@ -2,7 +2,6 @@ package InventorySystem;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -83,7 +82,7 @@ public class InventoryBean {
 
 	public void setselected() {
 		selectedItem = (ItemDataType) selectedNode.getData();
-		selectedNode.setExpanded(true);
+		collapsingORexpanding(selectedNode, true);
 	}
 
 	public void init(String login) {
@@ -158,21 +157,37 @@ public class InventoryBean {
 		}
 	}
 
-	public StreamedContent getImage() throws IOException {
+	public StreamedContent getImage() {
 		FacesContext context = FacesContext.getCurrentInstance();
-
 		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-			// So, we're rendering the view. Return a stub StreamedContent so
-			// that it will generate right URL.
 			return new DefaultStreamedContent();
 		} else {
-			// So, browser is requesting the image. Return a real
-			// StreamedContent with the image bytes.
-			String filename = context.getExternalContext().getRequestParameterMap().get("filename");
+			String filepath = InventoryConfig.prop.getProperty("downloadPath");
+			try{
 			return new DefaultStreamedContent(
-					new FileInputStream(new File("C:\\KKSport\\Images", selectedItem.getItem().ImageName)));
+					new FileInputStream(new File(filepath, selectedItem.getItem().ImageName)));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Error streaming image");
+			}
 		}
+		return null;
 	}
+	
+	public void collapsingORexpanding(TreeNode n, boolean option) {
+	    if(n.getChildren().size() == 0) {
+	        n.setSelected(false);
+	    }
+	    else {
+	        for(TreeNode s: n.getChildren()) {
+	            collapsingORexpanding(s, option);
+	        }
+	        n.setExpanded(option);
+	        n.setSelected(false);
+	    }
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public TreeNode getRoot() {

@@ -39,8 +39,8 @@ public class DatabaseConnector {
 	public void ConnectToDB() {
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databasename=kkDatabase", "sa",
-					"3e235fa9");
+			conn = DriverManager.getConnection(InventoryConfig.prop.getProperty("dbConnectionString"),
+					InventoryConfig.prop.getProperty("dbUser"), InventoryConfig.prop.getProperty("dbPassword"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -469,7 +469,7 @@ public class DatabaseConnector {
 		return list;
 	}
 
-	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation,int qty) {
+	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation, int qty) {
 		ConnectToDB();
 		List<StockItemDataType> list = new ArrayList<>();
 		try {

@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +50,8 @@ public class AdminPanelBean {
 	FacesContext context = FacesContext.getCurrentInstance();
 	StockItemDataType newitem = new StockItemDataType();
 	public boolean newuser_adminEnabled;
-	private String newItem_imageName="";
+	private String newItem_imageName = "";
+
 	public void init() {
 		if (!SessionUtils.getAdminPanelRights()) {
 			SessionUtils.getSession().invalidate();
@@ -114,13 +114,12 @@ public class AdminPanelBean {
 	}
 
 	public void addStock() {
-		if(newitem.ItemCode.isEmpty() || newitem.ItemCode.trim().length()==0)
-		{
+		if (newitem.ItemCode.isEmpty() || newitem.ItemCode.trim().length() == 0) {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
 			return;
 		}
-		
+
 		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
 				newitem.price, newitem.ItemCategory))
 			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation, newitem.Stock,
@@ -239,32 +238,36 @@ public class AdminPanelBean {
 	}
 
 	public void upload(FileUploadEvent event) {
-		try { 
+		try {
 			UploadedFile uploadedFile = event.getFile();
-			ResampleOp resample = new ResampleOp(300, 300);
-			InputStream input = uploadedFile.getInputstream();
-			BufferedImage image = ImageIO.read(input);
-			input.close();
-			image = resample.filter(image, null);
-			newItem_imageName =uploadedFile.getFileName();
-			ImageIO.write(image, "jpg", new File("C:\\KKSport\\Images\\" + uploadedFile.getFileName()));
+			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
+			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
+			if (doResize) {
+				int height = Integer.valueOf(InventoryConfig.prop.getProperty("resizeHeight"));
+				int width = Integer.valueOf(InventoryConfig.prop.getProperty("resizeWidth"));
+				ResampleOp resample = new ResampleOp(height, width);
+				image = resample.filter(image, null);
+			}
+			newItem_imageName = uploadedFile.getFileName();
+			String downloadPath = InventoryConfig.prop.getProperty("downloadPath") + uploadedFile.getFileName();
+			System.out.println(downloadPath);
+			ImageIO.write(image, "jpg", new File(downloadPath));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	public StreamedContent getImage() throws IOException {
-	    FacesContext context = FacesContext.getCurrentInstance();
 
-	    if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-	        return new DefaultStreamedContent();
-	    }
-	    else {
-	        return new DefaultStreamedContent(new FileInputStream(new File("C:\\KKSport\\Images", selectedItem.getItem().ImageName)));
-	    }
+	public StreamedContent getImage() throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+			return new DefaultStreamedContent();
+		} else {
+			return new DefaultStreamedContent(new FileInputStream(
+					new File(InventoryConfig.prop.getProperty("downloadPath"), selectedItem.getItem().ImageName)));
+		}
 	}
-	
+
 	///////////////////////////////////////////////////
 
 	public List<ItemCategoryDataType> getCategories() {
