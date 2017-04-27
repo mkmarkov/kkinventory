@@ -10,7 +10,7 @@
 	</f:metadata>
 </h:head>
 <h:body>
-	<h:form id="form">
+	<h:form id="form" style="font-size:0.75em">
 		<p:growl id="growl" showDetail="true" autoUpdate="true" />
 		<p:toolbar>
 			<f:facet name="left">
@@ -29,7 +29,7 @@
 		<p:messages id="messages" showDetail="true" autoUpdate="true"
 			closable="true" />
 		<p:tabView id="tabview">
-			<p:tab id="stocktab" title="Управление на артикули">
+			<p:tab id="stocktab" title="Управление на артикули" style="font-size:0.75em">
 				<p:panelGrid id="stockpnlgrid" columns="2">
 					<p:treeTable id="stocktable" var="stock"
 						value="#{adminPanelBean.root}"
@@ -123,7 +123,7 @@
 					</p:panel>
 				</p:panelGrid>
 			</p:tab>
-			<p:tab id="usermgmtTab" title="Управление на потребители">
+			<p:tab id="usermgmtTab" title="Управление на потребители" style="font-size:0.75em">
 				
 				<p:panelGrid id="usergrid" columns="2">
 					<p:dataTable id="errorTable" var="errors"
