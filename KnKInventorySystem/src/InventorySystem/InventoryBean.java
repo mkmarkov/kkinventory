@@ -58,26 +58,26 @@ public class InventoryBean {
 		}
 		if (dbconn.RemoveStockQuantity(selectedItem.getItem().ItemID, Quantity)) {
 			selectedItem.getItem().Stock -= Quantity;
-			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
+			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,selectedItem.getItem().ItemCategory,
 					Quantity, OrderDetails, "Remove", selectedItem.getItem().ItemID);
 			ItemDataType parent = (ItemDataType) selectedNode.getParent().getData();
 			parent.getItem().Stock -= Quantity;
 		}
-		historyList = dbconn.getUserHistory(Employee);
+		historyList = dbconn.getUserHistory(Employee,null,null);
 	}
 
-	public void search(String ItemCode, String ItemVariation, int qty) {
+	public void search(String ItemCode, String ItemVariation,String Color, int qty) {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock(ItemCode, ItemVariation, qty);
+		stockList = dbconn.SearchStock(ItemCode, ItemVariation,Color, qty);
 		categories = dbconn.getCategories();
 		expandTable = true;
 		loadTree();
 	}
 
 	public void loadHistory(String Employee) {
-		historyList = dbconn.getUserHistory(Employee);
+		historyList = dbconn.getUserHistory(Employee,null,null);
 	}
 
 	public void setselected() {
@@ -90,9 +90,9 @@ public class InventoryBean {
 			stockList.clear();
 			categories.clear();
 			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "", 0);
+			stockList = dbconn.SearchStock("", "","", 0);
 			categories = dbconn.getCategories();
-			historyList = dbconn.getUserHistory(login);
+			historyList = dbconn.getUserHistory(login,null,null);
 			Iterator<LogDataType> itr = historyList.iterator();
 			while (itr.hasNext()) {
 				LogDataType temp = itr.next();

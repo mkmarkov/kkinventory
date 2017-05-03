@@ -2,6 +2,7 @@ package InventorySystem;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,13 +16,16 @@ import KKDataTypes.StockItemDataType;
 
 public class DatabaseConnector {
 
-	private final String GetStockJDBCCall = "{ call getStock (?,?,?)}"; // ItemCode,ItemVariation,Qty
+	private final String GetStockJDBCCall = "{ call getStock (?,?,?,?)}"; // ItemCode,ItemVariation,Color,Qty
 	private final String AddStockJDBCCall = "{ call addStock (?,?,?,?,?,?,?)}"; // ItemCode,ItemVariation,Color,Stock,ImageName,ItemCatID,price
 	private final String deleteStock = "{ call deleteStock (?) }"; // ItemID;
 	private final String AddStockQuantityJDBCCall = "{ call addStockQuantity (?,?)}"; // ItemID,Quantity
 	private final String RemoveStockQuantityJDBCCall = "{ call removeStockQuantity (?,?)}"; // ItemID,Quantity
-	private final String GetUserHistoryJDBCCall = "{ call getUserHistory (?)}"; // Employee
-	private final String AddUserHistoryJDBCCall = "{ call addUserHistory (?,?,?,?,?,?,?)}"; // Employee,ItemCode,ItemVaraition,Quantity,OrderDetails,Action,ItemID
+	private final String GetUserHistoryJDBCCall = "{ call getUserHistory (?,?,?)}"; // Employee,DateFrom,DateTo
+	private final String GetHistoryByItem = "{ call getHistoryByItem (?,?,?)}"; // ItemID,DateFrom,DateTo
+	private final String GetHistoryByCategory = "{ call getHistoryByCategory (?,?,?)}"; // Category,DateFrom,DateTo
+	private final String GetHistoryByOrder = "{ call getHistoryByOrder (?,?,?)}"; // Order,DateFrom,DateTo
+	private final String AddUserHistoryJDBCCall = "{ call addUserHistory (?,?,?,?,?,?,?,?)}"; // Employee,ItemCode,ItemVaraitionm,ItemCategory,Quantity,OrderDetails,Action,ItemID
 	private final String ChangeCategory = "{ call ChangeCategory (?,?,?)}"; // ItemCatID,ItemCategory,ItemSubCategory
 	private final String AddCategory = "{ call AddCategory (?,?)}"; // ItemCatID,ItemCategory,ItemSubCategory
 	private final String DeleteCategory = "{ call DeleteCategory (?)}"; // ItemCatID,ItemCategory,ItemSubCategory
@@ -290,8 +294,8 @@ public class DatabaseConnector {
 		return false;
 	}
 
-	public boolean addUserHistory(String Employee, String ItemCode, String ItemVariation, int Quantity,
-			String OrderDetails, String Action, int ItemID) {
+	public boolean addUserHistory(String Employee, String ItemCode, String ItemVariation, String ItemCategory,
+			int Quantity, String OrderDetails, String Action, int ItemID) {
 		ConnectToDB();
 		CallableStatement call;
 		try {
@@ -299,10 +303,11 @@ public class DatabaseConnector {
 			call.setString(1, Employee);
 			call.setString(2, ItemCode);
 			call.setString(3, ItemVariation);
-			call.setInt(4, Quantity);
-			call.setString(5, OrderDetails);
-			call.setString(6, Action);
-			call.setInt(7, ItemID);
+			call.setString(4, ItemCategory);
+			call.setInt(5, Quantity);
+			call.setString(6, OrderDetails);
+			call.setString(7, Action);
+			call.setInt(8, ItemID);
 			call.executeUpdate();
 			if (call.getUpdateCount() >= 1)
 				return true;
@@ -319,23 +324,111 @@ public class DatabaseConnector {
 		return false;
 	}
 
-	public List<LogDataType> getUserHistory(String Employee) {
+	public List<LogDataType> getUserHistory(String Employee, Date DateFrom, Date DateTo) {
 		ConnectToDB();
 		List<LogDataType> list = new ArrayList<>();
 		CallableStatement call;
 		try {
 			call = conn.prepareCall(GetUserHistoryJDBCCall);
 			call.setString(1, Employee);
+			call.setDate(2, DateFrom);
+			call.setDate(3, DateTo);
 			ResultSet rs = call.executeQuery();
 			while (rs.next()) {
 				LogDataType temp = new LogDataType(rs.getString("Employee"), rs.getInt("LogID"),
-						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("Action"),
-						rs.getString("OrderDetails"), rs.getDate("Timestamp"), rs.getInt("Quantity"),
-						rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
+						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("ItemCategory"),
+						rs.getString("Action"), rs.getString("OrderDetails"), rs.getDate("Timestamp"),
+						rs.getInt("Quantity"), rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
 				list.add(temp);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return list;
+	}
+
+	public List<LogDataType> getHistoryByItem(String ItemCode, Date DateFrom, Date DateTo) {
+		ConnectToDB();
+		List<LogDataType> list = new ArrayList<>();
+		CallableStatement call;
+		try {
+			call = conn.prepareCall(GetHistoryByItem);
+			call.setString(1, ItemCode);
+			call.setDate(2, DateFrom);
+			call.setDate(3, DateTo);
+			ResultSet rs = call.executeQuery();
+			while (rs.next()) {
+				LogDataType temp = new LogDataType(rs.getString("Employee"), rs.getInt("LogID"),
+						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("ItemCategory"),
+						rs.getString("Action"), rs.getString("OrderDetails"), rs.getDate("Timestamp"),
+						rs.getInt("Quantity"), rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
+				list.add(temp);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return list;
+	}
+	
+	public List<LogDataType> getHistoryByOrder(String Order, Date DateFrom, Date DateTo) {
+		ConnectToDB();
+		List<LogDataType> list = new ArrayList<>();
+		CallableStatement call;
+		try {
+			call = conn.prepareCall(GetHistoryByOrder);
+			call.setString(1, Order);
+			call.setDate(2, DateFrom);
+			call.setDate(3, DateTo);
+			ResultSet rs = call.executeQuery();
+			while (rs.next()) {
+				LogDataType temp = new LogDataType(rs.getString("Employee"), rs.getInt("LogID"),
+						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("ItemCategory"),
+						rs.getString("Action"), rs.getString("OrderDetails"), rs.getDate("Timestamp"),
+						rs.getInt("Quantity"), rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
+				list.add(temp);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return list;
+	}
+
+	public List<LogDataType> getHistoryByCategory(String Category, Date DateFrom, Date DateTo) {
+		ConnectToDB();
+		List<LogDataType> list = new ArrayList<>();
+		CallableStatement call;
+		try {
+			call = conn.prepareCall(GetHistoryByCategory);
+			call.setString(1, Category);
+			call.setDate(2, DateFrom);
+			call.setDate(3, DateTo);
+			ResultSet rs = call.executeQuery();
+			while (rs.next()) {
+				LogDataType temp = new LogDataType(rs.getString("Employee"), rs.getInt("LogID"),
+						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("ItemCategory"),
+						rs.getString("Action"), rs.getString("OrderDetails"), rs.getDate("Timestamp"),
+						rs.getInt("Quantity"), rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
+				list.add(temp);
+			}
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
@@ -356,13 +449,12 @@ public class DatabaseConnector {
 			ResultSet rs = call.executeQuery();
 			while (rs.next()) {
 				LogDataType temp = new LogDataType(rs.getString("Employee"), rs.getInt("LogID"),
-						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("Action"),
-						rs.getString("OrderDetails"), rs.getDate("Timestamp"), rs.getInt("Quantity"),
-						rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
+						rs.getString("ItemCode"), rs.getString("ItemVariation"), rs.getString("ItemCategory"),
+						rs.getString("Action"), rs.getString("OrderDetails"), rs.getDate("Timestamp"),
+						rs.getInt("Quantity"), rs.getInt("MarkedAsError"), rs.getInt("ItemID"));
 				list.add(temp);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try {
@@ -469,14 +561,15 @@ public class DatabaseConnector {
 		return list;
 	}
 
-	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation, int qty) {
+	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation, String Color, int qty) {
 		ConnectToDB();
 		List<StockItemDataType> list = new ArrayList<>();
 		try {
 			CallableStatement call = conn.prepareCall(GetStockJDBCCall);
 			call.setString(1, ItemCode);
 			call.setString(2, ItemVariation);
-			call.setInt(3, qty);
+			call.setString(3, Color);
+			call.setInt(4, qty);
 			ResultSet rs = call.executeQuery();
 
 			while (rs.next()) {

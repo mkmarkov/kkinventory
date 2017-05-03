@@ -6,7 +6,7 @@
 <h:head>
 	<title>login</title>
 	<f:metadata>
-		<f:event type="preRenderView" listener="#{adminPanelBean.init()}"/>
+		<f:event type="preRenderView" listener="#{adminPanelBean.init()}" />
 	</f:metadata>
 </h:head>
 <h:body>
@@ -29,7 +29,8 @@
 		<p:messages id="messages" showDetail="true" autoUpdate="true"
 			closable="true" />
 		<p:tabView id="tabview">
-			<p:tab id="stocktab" title="Управление на артикули" style="font-size:0.75em">
+			<p:tab id="stocktab" title="Управление на артикули"
+				style="font-size:0.75em">
 				<p:panelGrid id="stockpnlgrid" columns="2">
 					<p:treeTable id="stocktable" var="stock"
 						value="#{adminPanelBean.root}"
@@ -99,8 +100,10 @@
 							<p:commandButton value="Добави	"
 								action="#{adminPanelBean.addStock()}"
 								update="form:tabview:stockpnlgrid" />
-							<p:fileUpload value="#{adminPanelBean.file}" fileUploadListener="#{adminPanelBean.upload}"
-							auto="true" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced" skinSimple="true"/>
+							<p:fileUpload value="#{adminPanelBean.file}"
+								fileUploadListener="#{adminPanelBean.upload}" auto="true"
+								allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced"
+								skinSimple="true" />
 						</p:panelGrid>
 					</p:panel>
 					<p:panel id="catpanel" header="Управление на категории"
@@ -123,13 +126,15 @@
 					</p:panel>
 				</p:panelGrid>
 			</p:tab>
-			<p:tab id="usermgmtTab" title="Управление на потребители" style="font-size:0.75em">
-				
+			<p:tab id="usermgmtTab" title="Управление на потребители"
+				style="font-size:0.75em">
+
 				<p:panelGrid id="usergrid" columns="2">
 					<p:dataTable id="errorTable" var="errors"
 						value="#{adminPanelBean.historyList}"
 						selection="#{adminPanelBean.selectedHistory}"
-						selectionMode="single" rowKey="#{errors.logID}">
+						selectionMode="single" rowKey="#{errors.logID}"
+						style="font-size:0.75em">
 						<p:column headerText="Код">
 			#{errors.itemCode}
 			</p:column>
@@ -154,45 +159,12 @@
 								update="errorTable" />
 						</f:facet>
 					</p:dataTable>
-
-					<p:panel id="reportpanel">
-						Потребител: <p:inputText binding="#{reportInput}" />
-						<p:commandButton value="Отчет"
-							action="#{adminPanelBean.getReport(reportInput.value)}"
-							update="reportTable" style="margin-left: 10px" />
-						<p:commandButton value="Изчисти"
-							action="#{adminPanelBean.clearReport()}" update="reportTable"
-							style="margin-left: 10px" />
-						<p:dataTable id="reportTable" var="report"
-							value="#{adminPanelBean.userReport}" scrollable="true"
-							scrollHeight="350">
-							<p:ajax event="rowSelect" partialSubmit="true" />
-							<p:column headerText="Служител">
-				#{report.employee}
-			</p:column>
-							<p:column headerText="Код">
-				#{report.itemCode}
-			</p:column>
-							<p:column headerText="Вариация">
-				#{report.itemVariation}
-			</p:column>
-							<p:column headerText="Количество">
-				#{report.quantity}
-			</p:column>
-							<p:column headerText="Дата">
-				#{report.timestamp}
-			</p:column>
-							<p:column headerText="Детайли на поръчката">
-				#{report.orderDetails}
-			</p:column>
-						</p:dataTable>
-
-					</p:panel>
 					<p:panel id="loginpanel">
 						<p:panelGrid columns="3">
 							<p:selectOneListbox value="#{adminPanelBean.selectedLogin}"
 								scrollHeight="150">
-								<p:ajax partialSubmit="true" event="change" update="form:tabview:usergrid"/>
+								<p:ajax partialSubmit="true" event="change"
+									update="form:tabview:usergrid" />
 								<f:selectItems value="#{adminPanelBean.loginsList}" />
 							</p:selectOneListbox>
 							<p:panel>
@@ -217,7 +189,58 @@
 				</p:panelGrid>
 
 			</p:tab>
+			<p:tab title="Отчети">
+				<p:panel id="reportpanel">
+					<p:selectOneMenu value="#{adminPanelBean.reportSearchType}"
+						size="5">
+						<f:selectItem itemValue="usr" itemLabel="Потребител" />
+						<f:selectItem itemValue="cat" itemLabel="Категория" />
+						<f:selectItem itemValue="item" itemLabel="Артикул(Код)" />
+						<f:selectItem itemValue="order" itemlabel="Поръчка" />
+					</p:selectOneMenu>
+						Търсене: <p:inputText binding="#{reportInput}" size="5"
+						style="margin-bot:5px" />
+						От: <p:calendar value="#{adminPanelBean.dateFrom}"
+						pattern="yyyy-MM-dd" size="5">
+					</p:calendar>
+						До:	<p:calendar value="#{adminPanelBean.dateTo}"
+						pattern="yyyy-MM-dd" size="5">
+					</p:calendar>
+					<p:commandButton value="Отчет"
+						action="#{adminPanelBean.getReport(reportInput.value)}"
+						update="reportTable" style="margin-left: 10px" />
+					<p:commandButton value="Изчисти"
+						action="#{adminPanelBean.clearReport()}" update="reportTable"
+						style="margin-left: 10px" />
+					<p:dataTable id="reportTable" var="report"
+						value="#{adminPanelBean.userReport}" scrollable="true"
+						scrollHeight="340">
+						<p:ajax event="rowSelect" partialSubmit="true" />
+						<p:column headerText="Служител">
+				#{report.employee}
+			</p:column>
+						<p:column headerText="Категория">
+				#{report.itemCategory}
+			</p:column>
+						<p:column headerText="Код">
+				#{report.itemCode}
+			</p:column>
+						<p:column headerText="Вариация">
+				#{report.itemVariation}
+			</p:column>
+						<p:column headerText="Количество">
+				#{report.quantity}
+			</p:column>
+						<p:column headerText="Дата">
+				#{report.timestamp}
+			</p:column>
+						<p:column headerText="Детайли на поръчката">
+				#{report.orderDetails}
+			</p:column>
+					</p:dataTable>
 
+				</p:panel>
+			</p:tab>
 		</p:tabView>
 
 

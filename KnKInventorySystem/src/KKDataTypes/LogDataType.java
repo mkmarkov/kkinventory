@@ -14,8 +14,9 @@ public class LogDataType {
 	public int Quantity;
 	public int MarkedAsError;
 	public int ItemID;
-
-	public LogDataType(String employee, int logID, String itemCode, String itemVariation, String action,
+	public String ItemCategory;
+	
+	public LogDataType(String employee, int logID, String itemCode, String itemVariation,String ItemCategory, String action,
 			String orderDetails, Date timestamp, int quantity, int markedAsError, int ItemID) {
 		super();
 		Employee = employee;
@@ -28,9 +29,26 @@ public class LogDataType {
 		Quantity = quantity;
 		MarkedAsError = markedAsError;
 		this.ItemID = ItemID;
+		this.ItemCategory = ItemCategory;
 	}
 
 	public LogDataType() {
+	}
+
+	public int getItemID() {
+		return ItemID;
+	}
+
+	public void setItemID(int itemID) {
+		ItemID = itemID;
+	}
+
+	public String getItemCategory() {
+		return ItemCategory;
+	}
+
+	public void setItemCategory(String itemCategory) {
+		ItemCategory = itemCategory;
 	}
 
 	public String getEmployee() {

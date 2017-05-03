@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,6 +52,9 @@ public class AdminPanelBean {
 	StockItemDataType newitem = new StockItemDataType();
 	public boolean newuser_adminEnabled;
 	private String newItem_imageName = "";
+	public Date dateFrom;
+	public Date dateTo;
+	public String reportSearchType;
 
 	public void init() {
 		if (!SessionUtils.getAdminPanelRights()) {
@@ -63,7 +67,7 @@ public class AdminPanelBean {
 			stockList.clear();
 			categories.clear();
 			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "", 0);
+			stockList = dbconn.SearchStock("", "", "", 0);
 			categories = dbconn.getCategories();
 			loadTree();
 		}
@@ -75,13 +79,26 @@ public class AdminPanelBean {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock("", "", 0);
+		stockList = dbconn.SearchStock("", "", "", 0);
 		categories = dbconn.getCategories();
 		loadTree();
 	}
 
-	public void getReport(String employee) {
-		userReport = dbconn.getUserHistory(employee);
+	public void getReport(String search) {
+		java.sql.Date dTo = null;
+		java.sql.Date dfrom = null;
+		if (dateFrom != null)
+			dfrom = new java.sql.Date(dateFrom.getTime());
+		if (dateTo != null)
+			dTo = new java.sql.Date(dateTo.getTime());
+		if(reportSearchType.equals("usr"))
+		userReport = dbconn.getUserHistory(search, dfrom, dTo);
+		if(reportSearchType.equals("cat"))
+			userReport = dbconn.getHistoryByCategory(search, dfrom, dTo);
+		if(reportSearchType.equals("item"))
+			userReport = dbconn.getHistoryByItem(search, dfrom, dTo);
+		if(reportSearchType.equals("order"))
+			userReport = dbconn.getHistoryByOrder(search, dfrom, dTo);
 	}
 
 	public void addCategory(String Category) {
@@ -122,8 +139,8 @@ public class AdminPanelBean {
 
 		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
 				newitem.price, newitem.ItemCategory))
-			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation, newitem.Stock,
-					"", "NEWITEM", 0);
+			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation,
+					newitem.ItemCategory, newitem.Stock, "", "NEWITEM", 0);
 		else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
@@ -135,7 +152,8 @@ public class AdminPanelBean {
 	public void deleteStock(String Employee) {
 		if (dbconn.deleteStock(selectedItem.getItem().ItemID))
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-					selectedItem.getItem().Stock, "", "DELETE", selectedItem.getItem().ItemID);
+					selectedItem.getItem().ItemCategory, selectedItem.getItem().Stock, "", "DELETE",
+					selectedItem.getItem().ItemID);
 		else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при изтриване на артикул", ""));
@@ -187,7 +205,7 @@ public class AdminPanelBean {
 	public void addStockQuantity(int Quantity, String Employee) {
 		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-					Quantity, "", "Add", selectedItem.getItem().ItemID);
+					selectedItem.getItem().ItemCategory, Quantity, "", "Add", selectedItem.getItem().ItemID);
 		else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
@@ -384,6 +402,30 @@ public class AdminPanelBean {
 
 	public String getSelectedLogin() {
 		return SelectedLogin;
+	}
+
+	public Date getDateFrom() {
+		return dateFrom;
+	}
+
+	public void setDateFrom(Date dateFrom) {
+		this.dateFrom = dateFrom;
+	}
+
+	public Date getDateTo() {
+		return dateTo;
+	}
+
+	public void setDateTo(Date dateTo) {
+		this.dateTo = dateTo;
+	}
+
+	public String getReportSearchType() {
+		return reportSearchType;
+	}
+
+	public void setReportSearchType(String reportSearchType) {
+		this.reportSearchType = reportSearchType;
 	}
 
 }

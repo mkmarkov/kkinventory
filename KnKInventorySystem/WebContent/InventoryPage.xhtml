@@ -21,11 +21,13 @@
 				<p:inputText binding="#{code}" style="margin-left: 10px" />
 				Вариация:
 				<p:inputText binding="#{variation}" style="margin-left: 10px" />
+				Цвят:
+				<p:inputText binding="#{clr}" style="margin-left: 10px" />
 				Наличност
 				<p:inputText binding="#{search_qty}" type="number"
 				style="margin-left: 10px" />
 			<p:commandButton value="Търси"
-				action="#{inventoryBean.search(code.value,variation.value,search_qty.value)}"
+				action="#{inventoryBean.search(code.value,variation.value,clr.value,search_qty.value)}"
 				update="form:stocktable" style="margin-left: 10px" />
 			<p:commandButton value="test" action="#{inventoryBean.init()}"
 				update="form:stocktable" style="margin-left: 10px" rendered="false" />
@@ -50,6 +52,9 @@
 			 	</p:column>
 		<p:column headerText="Вариация">
 			#{stock.item.itemVariation}
+			 	</p:column>
+		<p:column headerText="Категория">
+			#{stock.item.itemCategory}
 			 	</p:column>
 		<p:column headerText="Цвят">
 			#{stock.item.color}
@@ -90,9 +95,12 @@
 		</p:panel>
 		<p:dataTable id="historyTable" var="history"
 			value="#{inventoryBean.historyList}"
-			selection="#{inventoryBean.selectedHistory}" scrollable="true"
-			selectionMode="single" rowKey="#{history.logID}" scrollHeight="350">
+			selection="#{inventoryBean.selectedHistory}" scrollable="true" 
+			selectionMode="single" rowKey="#{history.logID}" scrollHeight="350" style="margin-top:10px">
 			<p:ajax event="rowSelect" partialSubmit="true" />
+			<p:column headerText="Категория">
+				#{history.itemCategory}
+			</p:column>
 			<p:column headerText="Код">
 				#{history.itemCode}
 			</p:column>
