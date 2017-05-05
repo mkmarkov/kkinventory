@@ -95,8 +95,9 @@
 		</p:panel>
 		<p:dataTable id="historyTable" var="history"
 			value="#{inventoryBean.historyList}"
-			selection="#{inventoryBean.selectedHistory}" scrollable="true" 
-			selectionMode="single" rowKey="#{history.logID}" scrollHeight="350" style="margin-top:10px">
+			selection="#{inventoryBean.selectedHistory}" scrollable="true"
+			selectionMode="single" rowKey="#{history.logID}" scrollHeight="350"
+			style="margin-top:10px">
 			<p:ajax event="rowSelect" partialSubmit="true" />
 			<p:column headerText="Категория">
 				#{history.itemCategory}
@@ -126,7 +127,9 @@
 	<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog"
 		resizable="false" size="300">
 		<p:graphicImage value="#{inventoryBean.image}">
-			<f:param name="filename" value="#{inventoryBean.selectedItem.item.imageName}" height="200" width="200" />
+			<f:param name="filename"
+				value="#{inventoryBean.selectedItem.item.imageName}" height="200"
+				width="200" />
 		</p:graphicImage>
 		<p:panelGrid columns="2">
 				Код:
