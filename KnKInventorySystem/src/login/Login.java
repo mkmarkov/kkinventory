@@ -13,11 +13,12 @@ import javax.servlet.http.HttpSession;
 public class Login implements Serializable {
 
 	private static final long serialVersionUID = 1094801825228386363L;
-	
+
 	private String pwd;
 	private String msg;
 	private String user;
 	private boolean adminPanelEnabled;
+
 	public String getPwd() {
 		return pwd;
 	}
@@ -42,7 +43,7 @@ public class Login implements Serializable {
 		this.user = user;
 	}
 
-	//validate login
+	// validate login
 	public String validateUsernamePassword() {
 		boolean valid = LoginDAO.validate(user, pwd);
 		if (valid) {
@@ -52,20 +53,25 @@ public class Login implements Serializable {
 			session.setAttribute("adminEnabled", adminPanelEnabled);
 			return "OK";
 		} else {
-			FacesContext.getCurrentInstance().addMessage(
-					null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN,
-							"Incorrect Username and Passowrd",
-							"Please enter correct username and Password"));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"Incorrect Username and Passowrd", "Please enter correct username and Password"));
 			return "login";
 		}
 	}
 
-	//logout event, invalidate session
+	// logout event, invalidate session
 	public String logout() {
 		HttpSession session = SessionUtils.getSession();
 		session.invalidate();
 		return "login";
 	}
-	
+
+	public boolean isAdminPanelEnabled() {
+		return adminPanelEnabled;
+	}
+
+	public void setAdminPanelEnabled(boolean adminPanelEnabled) {
+		this.adminPanelEnabled = adminPanelEnabled;
+	}
+
 }

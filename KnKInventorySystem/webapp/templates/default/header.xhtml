@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<ui:composition>
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Добре дошли, #{login.user}</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#">Logout</a></li>
+				</ul>
+				<h:form class="navbar-form navbar-left">
+					<p:inputText styleClass="form-control" style="margin-right: 10px"
+						placeholder="Код..." value="#{inventoryBean.search_ItemCode}" />
+					<p:inputText styleClass="form-control" style="margin-right: 10px"
+						placeholder="Вариация..."
+						value="#{inventoryBean.search_ItemVariation}" />
+					<p:inputText styleClass="form-control" style="margin-right: 10px"
+						placeholder="Цвят..." value="#{inventoryBean.search_Color}" />
+					<p:inputText styleClass="form-control" style="margin-right: 10px"
+						placeholder="Количество..." type="number"
+						value="#{inventoryBean.search_qty}" />
+					<p:commandButton value="Търси" action="#{inventoryBean.search()}"
+						style="margin-left: 10px" />
+				</h:form>
+			</div>
+		</div>
+	</div>
+</ui:composition>
+</html>

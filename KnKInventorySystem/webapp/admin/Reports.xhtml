@@ -1,0 +1,60 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/default/main.xhtml">
+	<ui:define name="content">
+		<h:form id="form">
+			<p:selectOneMenu value="#{adminPanelBean.reportSearchType}">
+				<f:selectItem itemValue="usr" itemLabel="Потребител" />
+				<f:selectItem itemValue="cat" itemLabel="Категория" />
+				<f:selectItem itemValue="item" itemLabel="Артикул(Код)" />
+				<f:selectItem itemValue="order" itemlabel="Поръчка" />
+			</p:selectOneMenu>
+						Търсене: <p:inputText binding="#{reportInput}"
+				style="margin-bot:5px" />
+						От: <p:calendar value="#{adminPanelBean.dateFrom}"
+				pattern="yyyy-MM-dd" size="5">
+			</p:calendar>
+						До:	<p:calendar value="#{adminPanelBean.dateTo}"
+				pattern="yyyy-MM-dd" size="5">
+			</p:calendar>
+			<p:commandButton value="Отчет"
+				action="#{adminPanelBean.getReport(reportInput.value)}"
+				update="form:reportTable" style="margin-left: 10px" />
+			<p:commandButton value="Изчисти"
+				action="#{adminPanelBean.clearReport()}" update="reportTable"
+				style="margin-left: 10px" />
+			<p:dataTable id="reportTable" var="report"
+				value="#{adminPanelBean.userReport}" scrollable="true"
+				scrollHeight="340">
+				<p:ajax event="rowSelect" partialSubmit="true" />
+				<p:column headerText="Служител">
+				#{report.employee}
+			</p:column>
+				<p:column headerText="Категория">
+				#{report.itemCategory}
+			</p:column>
+				<p:column headerText="Код">
+				#{report.itemCode}
+			</p:column>
+				<p:column headerText="Вариация">
+				#{report.itemVariation}
+			</p:column>
+				<p:column headerText="Количество">
+				#{report.quantity}
+			</p:column>
+				<p:column headerText="Дата">
+				#{report.timestamp}
+			</p:column>
+				<p:column headerText="Детайли на поръчката">
+				#{report.orderDetails}
+			</p:column>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

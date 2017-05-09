@@ -2,6 +2,7 @@ package InventorySystem;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,10 +22,16 @@ import KKDataTypes.ItemCategoryDataType;
 import KKDataTypes.ItemDataType;
 import KKDataTypes.LogDataType;
 import KKDataTypes.StockItemDataType;
+import login.SessionUtils;
 
 @ManagedBean
 @SessionScoped
-public class InventoryBean {
+public class InventoryBean implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	TreeNode root = new DefaultTreeNode();
 	List<ItemCategoryDataType> categories = new ArrayList<>();
@@ -37,6 +44,8 @@ public class InventoryBean {
 	FacesContext context = FacesContext.getCurrentInstance();
 	boolean adminPanelEnabled = false;;
 	private boolean expandTable = false;
+	String search_ItemCode, search_ItemVariation, search_Color;
+	int search_qty;
 
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
@@ -50,7 +59,7 @@ public class InventoryBean {
 		}
 	}
 
-	public void removeStock(String Employee, int Quantity, String OrderDetails) {
+	public void removeStock(int Quantity, String OrderDetails) {
 		if (Quantity > selectedItem.getItem().getStock()) {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Недостатъчна наличност", ""));
@@ -58,41 +67,41 @@ public class InventoryBean {
 		}
 		if (dbconn.RemoveStockQuantity(selectedItem.getItem().ItemID, Quantity)) {
 			selectedItem.getItem().Stock -= Quantity;
-			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,selectedItem.getItem().ItemCategory,
-					Quantity, OrderDetails, "Remove", selectedItem.getItem().ItemID);
+			dbconn.addUserHistory(SessionUtils.getUserName(), selectedItem.getItem().ItemCode,
+					selectedItem.getItem().ItemVariation, selectedItem.getItem().ItemCategory, Quantity, OrderDetails,
+					"Remove", selectedItem.getItem().ItemID);
 			ItemDataType parent = (ItemDataType) selectedNode.getParent().getData();
 			parent.getItem().Stock -= Quantity;
 		}
-		historyList = dbconn.getUserHistory(Employee,null,null);
+		historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
 	}
 
-	public void search(String ItemCode, String ItemVariation,String Color, int qty) {
+	public void search() {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock(ItemCode, ItemVariation,Color, qty);
+		stockList = dbconn.SearchStock(search_ItemCode, search_ItemVariation, search_Color, search_qty);
 		categories = dbconn.getCategories();
 		expandTable = true;
 		loadTree();
 	}
 
-	public void loadHistory(String Employee) {
-		historyList = dbconn.getUserHistory(Employee,null,null);
+	public void loadHistory() {
+		historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
 	}
 
 	public void setselected() {
 		selectedItem = (ItemDataType) selectedNode.getData();
-		collapsingORexpanding(selectedNode, true);
 	}
 
-	public void init(String login) {
+	public void init() {
 		if (stockList.isEmpty()) {
 			stockList.clear();
 			categories.clear();
 			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "","", 0);
+			stockList = dbconn.SearchStock("", "", "", 0);
 			categories = dbconn.getCategories();
-			historyList = dbconn.getUserHistory(login,null,null);
+			historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
 			Iterator<LogDataType> itr = historyList.iterator();
 			while (itr.hasNext()) {
 				LogDataType temp = itr.next();
@@ -100,7 +109,7 @@ public class InventoryBean {
 				if (!Action.equals("Remove"))
 					itr.remove();
 			}
-			adminPanelEnabled = dbconn.isAdminPanelEnabled(login);
+			adminPanelEnabled = dbconn.isAdminPanelEnabled(SessionUtils.getUserName());
 			loadTree();
 		}
 	}
@@ -163,35 +172,52 @@ public class InventoryBean {
 			return new DefaultStreamedContent();
 		} else {
 			String filepath = InventoryConfig.prop.getProperty("downloadPath");
-			try{
-			return new DefaultStreamedContent(
-					new FileInputStream(new File(filepath, selectedItem.getItem().ImageName)));
-			}
-			catch(Exception e)
-			{
+			try {
+				return new DefaultStreamedContent(
+						new FileInputStream(new File(filepath, selectedItem.getItem().ImageName)));
+			} catch (Exception e) {
 				System.out.println("Error streaming image");
 			}
 		}
 		return null;
-	}
-	
-	public void collapsingORexpanding(TreeNode n, boolean option) {
-	    if(n.getChildren().size() == 0) {
-	        n.setSelected(false);
-	    }
-	    else {
-	        for(TreeNode s: n.getChildren()) {
-	            collapsingORexpanding(s, option);
-	        }
-	        n.setExpanded(option);
-	        n.setSelected(false);
-	    }
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public TreeNode getRoot() {
 		return root;
+	}
+
+	public int getSearch_qty() {
+		return search_qty;
+	}
+
+	public void setSearch_qty(int search_qty) {
+		this.search_qty = search_qty;
+	}
+
+	public String getSearch_ItemCode() {
+		return search_ItemCode;
+	}
+
+	public void setSearch_ItemCode(String search_ItemCode) {
+		this.search_ItemCode = search_ItemCode;
+	}
+
+	public String getSearch_ItemVariation() {
+		return search_ItemVariation;
+	}
+
+	public void setSearch_ItemVariation(String search_ItemVariation) {
+		this.search_ItemVariation = search_ItemVariation;
+	}
+
+	public String getSearch_Color() {
+		return search_Color;
+	}
+
+	public void setSearch_Color(String search_Color) {
+		this.search_Color = search_Color;
 	}
 
 	public List<LogDataType> getHistoryList() {

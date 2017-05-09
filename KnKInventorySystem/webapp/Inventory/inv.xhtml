@@ -1,0 +1,123 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/default/main.xhtml">
+	<ui:define name="content">
+		<h:form id="form" style="font-size: 0.85em">
+			<f:event type="preRenderView" listener="#{inventoryBean.init()}" />
+			<p:treeTable id="stocktable" var="stock"
+				value="#{inventoryBean.root}"
+				selection="#{inventoryBean.selectedNode}" selectionMode="single"
+				rowKey="#{stock.itemID}" scrollable="true" scrollHeight="350">
+				<p:ajax event="select" listener="#{inventoryBean.setselected()}"
+					update="form:removestockpanel" />
+				<p:column headerText="Категория" styleClass="togglerClass">
+			#{stock.cat.itemCategory}
+			 	</p:column>
+				<p:column headerText="Код">
+			#{stock.item.itemCode}
+			 	</p:column>
+				<p:column headerText="Вариация">
+			#{stock.item.itemVariation}
+			 	</p:column>
+				<p:column headerText="Категория">
+			#{stock.item.itemCategory}
+			 	</p:column>
+				<p:column headerText="Цвят">
+			#{stock.item.color}
+			 	</p:column>
+				<p:column headerText="Наличност">
+			#{stock.item.stock}
+			 	</p:column>
+				<p:column headerText="Цена">
+			#{stock.item.price}
+			 	</p:column>
+				<p:column style="width:32px;text-align: center">
+					<p:commandButton update=":form:imagePanel"
+						oncomplete="PF('imageDialog').show()" icon="ui-icon-search"
+						title="View">
+						<f:setPropertyActionListener value="#{Stock}"
+							target="#{inventoryBean.selectedItem}" />
+					</p:commandButton>
+				</p:column>
+			</p:treeTable>
+			<p:panelGrid columns="2">
+				<p:panel id="removestockpanel">
+		Код
+		<p:inputText value="#{inventoryBean.selectedItem.item.itemCode}"
+						readonly="true" disabled="true" />
+		Вариация
+		<p:inputText value="#{inventoryBean.selectedItem.item.itemVariation}"
+						readonly="true" disabled="true" />
+		Наличност
+		<p:inputText value="#{inventoryBean.selectedItem.item.stock}"
+						readonly="true" disabled="true" />
+		Детайли за поръчката
+		<p:inputText binding="#{orderDetail}" />
+		Количество
+		<p:inputText binding="#{qty}" type="number" />
+					<p:commandButton value="Отметни"
+						action="#{inventoryBean.removeStock(qty.value,orderDetail.value)}"
+						update="form:historyTable,stocktable" />
+				</p:panel>
+				<p:dataTable id="historyTable" var="history"
+					value="#{inventoryBean.historyList}"
+					selection="#{inventoryBean.selectedHistory}" scrollable="true"
+					selectionMode="single" rowKey="#{history.logID}" scrollHeight="350"
+					style="margin-top:10px">
+					<p:ajax event="rowSelect" partialSubmit="true" />
+					<p:column headerText="Категория">
+				#{history.itemCategory}
+			</p:column>
+					<p:column headerText="Код">
+				#{history.itemCode}
+			</p:column>
+					<p:column headerText="Вариация">
+				#{history.itemVariation}
+			</p:column>
+					<p:column headerText="Количество">
+				#{history.quantity}
+			</p:column>
+					<p:column headerText="Дата">
+				#{history.timestamp}
+			</p:column>
+					<p:column headerText="Детайли на поръчката">
+				#{history.orderDetails}
+			</p:column>
+					<f:facet name="footer">
+						<p:commandButton value="Маркирай като грешка"
+							action="#{inventoryBean.markHistoryAsError()}"
+							update="form:historyTable" process="@this" partialSubmit="true" />
+					</f:facet>
+				</p:dataTable>
+			</p:panelGrid>
+
+			<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog"
+				resizable="false" size="300">
+				<p:graphicImage value="#{inventoryBean.image}">
+					<f:param name="filename"
+						value="#{inventoryBean.selectedItem.item.imageName}" height="200"
+						width="200" />
+				</p:graphicImage>
+				<p:panelGrid columns="2">
+				Код:
+				<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
+				Вариация:
+				<h:outputText
+						value="#{inventoryBean.selectedItem.item.itemVariation}" />
+				Цвят:
+				<h:outputText vallue="#{inventoryBean.selectedItem.item.color}" />
+				Категория:
+				<h:outputText
+						value="#{inventoryBean.selectedItem.item.itemCategory}" />
+				</p:panelGrid>
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

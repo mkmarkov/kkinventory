@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+	<h:form>
+		<ul class="nav nav-sidebar">
+			<li><p:commandLink value="Инвентар"
+					action="#{navigationHandler.navigateToInventory()}"
+					target="content" /></li>
+		</ul>
+		<ul class="nav nav-sidebar">
+			<li><p:commandLink value="Управление на артикули"
+					action="#{navigationHandler.navigateToItemManagement()}"
+					target="content" rendered="#{login.adminPanelEnabled}" /></li>
+			<li><p:commandLink value="Отчети"
+					action="#{navigationHandler.navigateToReports()}" target="content"
+					rendered="#{login.adminPanelEnabled}" /></li>
+			<li><p:commandLink value="Управление на потребители"
+					action="#{navigationHandler.navigateToUserManagement()}"
+					rendered="#{login.adminPanelEnabled}" target="content" /></li>
+		</ul>
+	</h:form>
+</ui:composition>
+</html>

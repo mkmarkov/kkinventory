@@ -12,7 +12,7 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @ApplicationScoped
 public class InventoryConfig {
-	static Properties prop = new Properties();
+	public static Properties prop = new Properties();
 	static InputStream input = null;
 
 	public static Properties getProp() {

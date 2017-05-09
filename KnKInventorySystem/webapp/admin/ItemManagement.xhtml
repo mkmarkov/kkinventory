@@ -1,0 +1,115 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/default/main.xhtml">
+	<ui:define name="content">
+		<h:form id="form">
+			<f:metadata>
+				<f:event type="preRenderView" listener="#{itemManagementBean.init()}" />
+			</f:metadata>
+			<p:growl id="growl" showDetail="true" autoUpdate="true" />
+			<p:messages id="messages" showDetail="true" autoUpdate="true"
+				closable="true" />
+				
+			<p:panelGrid id="stockpnlgrid" columns="2">
+				<p:treeTable id="stocktable" var="stock"
+					value="#{itemManagementBean.root}"
+					selection="#{itemManagementBean.selectedNode}"
+					selectionMode="single" rowKey="#{stock.itemID}" scrollable="true"
+					scrollHeight="300">
+					<p:ajax event="select"
+						listener="#{itemManagementBean.setselected()}"
+						update="form:AddStockQuantitypanel" />
+					<p:column headerText="Категория">
+			#{stock.cat.itemCategory}
+			 	</p:column>
+					<p:column headerText="Код">
+			#{stock.item.itemCode}
+			 	</p:column>
+					<p:column headerText="Вариация">
+			#{stock.item.itemVariation}
+			 	</p:column>
+					<p:column headerText="Цвят">
+			#{stock.item.color}
+			 	</p:column>
+					<p:column headerText="Наличност">
+			#{stock.item.stock}
+			 	</p:column>
+					<p:column headerText="Цена">
+			#{stock.item.price}
+			 	</p:column>
+				</p:treeTable>
+
+				<p:panel id="AddStockQuantitypanel" header="Опции за артикул">
+					<p:panelGrid columns="2">
+		Код
+		<p:inputText value="#{itemManagementBean.selectedItem.item.itemCode}"
+							readonly="true" disabled="true" />
+		Вариация
+		<p:inputText
+							value="#{itemManagementBean.selectedItem.item.itemVariation}"
+							readonly="true" disabled="true" />
+		Наличност
+		<p:inputText value="#{itemManagementBean.selectedItem.item.stock}"
+							readonly="true" disabled="true" />
+		Количество
+		<p:inputText binding="#{qty}" type="number" />
+						<p:commandButton value="Добави"
+							action="#{itemManagementBean.addStockQuantity(qty.value,login.user)}"
+							update="form:stockpnlgrid" />
+						<p:commandButton value="Изтрий"
+							action="#{itemManagementBean.deleteStock(login.user)}"
+							update="form:stockpnlgrid" />
+					</p:panelGrid>
+				</p:panel>
+
+				<p:panel id="addStock" header="Добавяне на арткул"
+					style="width:450px">
+					<p:panelGrid columns="2">
+		Код
+		<p:inputText value="#{itemManagementBean.newitem.itemCode}" />
+		Вариация
+		<p:inputText value="#{itemManagementBean.newitem.itemVariation}" />
+		Категория
+		<p:selectOneMenu value="#{itemManagementBean.newitem.itemCategory}">
+							<f:selectItems value="#{itemManagementBean.categories}" />
+						</p:selectOneMenu>
+		Цвят
+		<p:inputText value="#{itemManagementBean.newitem.color}" />
+		Цена
+		<p:inputNumber value="#{itemManagementBean.newitem.price}" />
+		Наличност
+		<p:inputText value="#{itemManagementBean.newitem.stock}" type="number" />
+						<p:commandButton value="Добави	"
+							action="#{itemManagementBean.addStock()}" update="stockpnlgrid" />
+						<p:fileUpload fileUploadListener="#{itemManagementBean.upload}"
+							auto="true" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+							mode="advanced" skinSimple="true" />
+					</p:panelGrid>
+				</p:panel>
+				<p:panel id="catpanel" header="Управление на категории"
+					style="width:450px;height:280px">
+					<p:panelGrid columns="2">
+						<p:selectOneListbox id="categories"
+							value="#{itemManagementBean.selectedCategory}">
+							<p:ajax event="change" partialSubmit="true" />
+							<f:selectItems value="#{itemManagementBean.categories}" />
+						</p:selectOneListbox>
+						<p:commandButton value="Изтрий"
+							action="#{itemManagementBean.deleteCategory()}"
+							update="form:stockpnlgrid" process="@this" partialSubmit="true" />
+						<p:inputText binding="#{newcat}" />
+						<p:commandButton value="Добави"
+							action="#{itemManagementBean.addCategory(newcat.value)}"
+							update="form:stockpnlgrid" />
+					</p:panelGrid>
+				</p:panel>
+			</p:panelGrid>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

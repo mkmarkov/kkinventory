@@ -1,10 +1,9 @@
-package InventorySystem;
+package administrator;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,6 +25,8 @@ import org.primefaces.model.UploadedFile;
 
 import com.mortennobel.imagescaling.ResampleOp;
 
+import InventorySystem.DatabaseConnector;
+import InventorySystem.InventoryConfig;
 import KKDataTypes.ItemCategoryDataType;
 import KKDataTypes.ItemDataType;
 import KKDataTypes.LogDataType;
@@ -35,12 +36,8 @@ import login.SessionUtils;
 
 @ManagedBean
 @SessionScoped
-public class AdminPanelBean implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1728596520838116283L;
-	
+public class itemManagementBean {
+
 	TreeNode selectedNode = new DefaultTreeNode();
 	TreeNode root = new DefaultTreeNode();
 	List<LogDataType> historyList = new ArrayList<>();
@@ -90,135 +87,6 @@ public class AdminPanelBean implements Serializable {
 		loadTree();
 	}
 
-	public void getReport(String search) {
-		java.sql.Date dTo = null;
-		java.sql.Date dfrom = null;
-		if (dateFrom != null)
-			dfrom = new java.sql.Date(dateFrom.getTime());
-		if (dateTo != null)
-			dTo = new java.sql.Date(dateTo.getTime());
-		if(reportSearchType.equals("usr"))
-		userReport = dbconn.getUserHistory(search, dfrom, dTo);
-		if(reportSearchType.equals("cat"))
-			userReport = dbconn.getHistoryByCategory(search, dfrom, dTo);
-		if(reportSearchType.equals("item"))
-			userReport = dbconn.getHistoryByItem(search, dfrom, dTo);
-		if(reportSearchType.equals("order"))
-			userReport = dbconn.getHistoryByOrder(search, dfrom, dTo);
-	}
-
-	public void addCategory(String Category) {
-		if (dbconn.AddCategory(Category, Category))
-			categories = dbconn.getCategories();
-		else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при добавяне на категория", ""));
-		}
-	}
-
-	public void clearReport() {
-		userReport.clear();
-	}
-
-	public void deleteCategory() {
-		Iterator<ItemCategoryDataType> itr = categories.iterator();
-		int catid = 0;
-		while (itr.hasNext()) {
-			ItemCategoryDataType temp = itr.next();
-			if (temp.getItemCategory().trim().equals(selectedCategory))
-				catid = temp.getItemCatID();
-		}
-		if (dbconn.deleteCategory(catid)) {
-			categories = dbconn.getCategories();
-		} else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
-		}
-	}
-
-	public void addStock() {
-		if (newitem.ItemCode.isEmpty() || newitem.ItemCode.trim().length() == 0) {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
-			return;
-		}
-
-		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
-				newitem.price, newitem.ItemCategory))
-			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation,
-					newitem.ItemCategory, newitem.Stock, "", "NEWITEM", 0);
-		else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
-		}
-		newitem = new StockItemDataType();
-		reload();
-	}
-
-	public void deleteStock(String Employee) {
-		if (dbconn.deleteStock(selectedItem.getItem().ItemID))
-			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-					selectedItem.getItem().ItemCategory, selectedItem.getItem().Stock, "", "DELETE",
-					selectedItem.getItem().ItemID);
-		else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при изтриване на артикул", ""));
-		}
-		reload();
-	}
-
-	public void approveMarkedError() {
-		if (dbconn.ReturnStock(selectedHistory.ItemID, selectedHistory.Quantity)) {
-			dbconn.approveMarkedError(selectedHistory.LogID);
-			reload();
-		} else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при маркиране на грешка", ""));
-		}
-	}
-
-	public void addUser(String Username, String Password) {
-		int adminPanelEnabled;
-		if (newuser_adminEnabled)
-			adminPanelEnabled = 1;
-		else
-			adminPanelEnabled = 0;
-		if (dbconn.addLogin(Username, Password, adminPanelEnabled))
-			loginsList = dbconn.getLogins_all();
-		else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при добавяне на потребител", ""));
-		}
-	}
-
-	public void removeUser() {
-		Iterator<Logins> itr = loginsList.iterator();
-		int userid = 0;
-		while (itr.hasNext()) {
-			Logins temp = itr.next();
-			if (temp.getUsername().trim().equals(SelectedLogin))
-				;
-			userid = temp.getUserID();
-		}
-		if (dbconn.removeLogin(userid))
-			loginsList = dbconn.getLogins_all();
-		else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при изтриване на потребител", ""));
-		}
-	}
-
-	public void addStockQuantity(int Quantity, String Employee) {
-		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
-			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-					selectedItem.getItem().ItemCategory, Quantity, "", "Add", selectedItem.getItem().ItemID);
-		else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
-		}
-		reload();
-	}
-
 	public void loadTree() {
 		Iterator<ItemCategoryDataType> catItr = categories.iterator();
 		while (catItr.hasNext()) {
@@ -240,10 +108,6 @@ public class AdminPanelBean implements Serializable {
 			}
 		}
 		calculateTotalStock();
-	}
-
-	public void setselected() {
-		selectedItem = (ItemDataType) selectedNode.getData();
 	}
 
 	public void calculateTotalStock() {
@@ -281,6 +145,21 @@ public class AdminPanelBean implements Serializable {
 		}
 	}
 
+	public void setselected() {
+		selectedItem = (ItemDataType) selectedNode.getData();
+	}
+
+	public void addStockQuantity(int Quantity, String Employee) {
+		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
+			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
+					selectedItem.getItem().ItemCategory, Quantity, "", "Add", selectedItem.getItem().ItemID);
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
+		}
+		reload();
+	}
+
 	public StreamedContent getImage() throws IOException {
 		FacesContext context = FacesContext.getCurrentInstance();
 
@@ -292,56 +171,63 @@ public class AdminPanelBean implements Serializable {
 		}
 	}
 
-	///////////////////////////////////////////////////
-
-	public List<ItemCategoryDataType> getCategories() {
-		return categories;
+	public void deleteStock(String Employee) {
+		if (dbconn.deleteStock(selectedItem.getItem().ItemID))
+			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
+					selectedItem.getItem().ItemCategory, selectedItem.getItem().Stock, "", "DELETE",
+					selectedItem.getItem().ItemID);
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при изтриване на артикул", ""));
+		}
+		reload();
 	}
 
-	public StockItemDataType getNewitem() {
-		return newitem;
+	public void addStock() {
+		if (newitem.ItemCode.isEmpty() || newitem.ItemCode.trim().length() == 0) {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
+			return;
+		}
+
+		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
+				newitem.price, newitem.ItemCategory))
+			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation,
+					newitem.ItemCategory, newitem.Stock, "", "NEWITEM", 0);
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
+		}
+		newitem = new StockItemDataType();
+		reload();
 	}
 
-	public void setNewitem(StockItemDataType newitem) {
-		this.newitem = newitem;
+	public void addCategory(String Category) {
+		if (dbconn.AddCategory(Category, Category))
+			categories = dbconn.getCategories();
+		else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при добавяне на категория", ""));
+		}
 	}
 
-	public boolean isNewuser_adminEnabled() {
-		return newuser_adminEnabled;
+	public void deleteCategory() {
+		Iterator<ItemCategoryDataType> itr = categories.iterator();
+		int catid = 0;
+		while (itr.hasNext()) {
+			ItemCategoryDataType temp = itr.next();
+			if (temp.getItemCategory().trim().equals(selectedCategory))
+				catid = temp.getItemCatID();
+		}
+		if (dbconn.deleteCategory(catid)) {
+			categories = dbconn.getCategories();
+		} else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
+		}
 	}
 
-	public void setNewuser_adminEnabled(boolean newuser_adminEnabled) {
-		this.newuser_adminEnabled = newuser_adminEnabled;
-	}
-
-	public List<LogDataType> getUserReport() {
-		return userReport;
-	}
-
-	public void setUserReport(List<LogDataType> userReport) {
-		this.userReport = userReport;
-	}
-
-	public DatabaseConnector getDbconn() {
-		return dbconn;
-	}
-
-	public void setDbconn(DatabaseConnector dbconn) {
-		this.dbconn = dbconn;
-	}
-
-	public void setCategories(List<ItemCategoryDataType> categories) {
-		this.categories = categories;
-	}
-
-	public ItemDataType getSelectedItem() {
-		return selectedItem;
-	}
-
-	public void setSelectedItem(ItemDataType selectedItem) {
-		this.selectedItem = selectedItem;
-	}
-
+	/////////////////////// SETTERS/GETTERS/////////////
 	public TreeNode getSelectedNode() {
 		return selectedNode;
 	}
@@ -362,6 +248,10 @@ public class AdminPanelBean implements Serializable {
 		return historyList;
 	}
 
+	public void setHistoryList(List<LogDataType> historyList) {
+		this.historyList = historyList;
+	}
+
 	public List<Logins> getLoginsList() {
 		return loginsList;
 	}
@@ -376,6 +266,22 @@ public class AdminPanelBean implements Serializable {
 
 	public void setSelectedHistory(LogDataType selectedHistory) {
 		this.selectedHistory = selectedHistory;
+	}
+
+	public DatabaseConnector getDbconn() {
+		return dbconn;
+	}
+
+	public void setDbconn(DatabaseConnector dbconn) {
+		this.dbconn = dbconn;
+	}
+
+	public List<ItemCategoryDataType> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(List<ItemCategoryDataType> categories) {
+		this.categories = categories;
 	}
 
 	public List<StockItemDataType> getStockList() {
@@ -402,12 +308,60 @@ public class AdminPanelBean implements Serializable {
 		this.selectedCategory = selectedCategory;
 	}
 
+	public String getSelectedLogin() {
+		return SelectedLogin;
+	}
+
 	public void setSelectedLogin(String selectedLogin) {
 		SelectedLogin = selectedLogin;
 	}
 
-	public String getSelectedLogin() {
-		return SelectedLogin;
+	public ItemDataType getSelectedItem() {
+		return selectedItem;
+	}
+
+	public void setSelectedItem(ItemDataType selectedItem) {
+		this.selectedItem = selectedItem;
+	}
+
+	public List<LogDataType> getUserReport() {
+		return userReport;
+	}
+
+	public void setUserReport(List<LogDataType> userReport) {
+		this.userReport = userReport;
+	}
+
+	public FacesContext getContext() {
+		return context;
+	}
+
+	public void setContext(FacesContext context) {
+		this.context = context;
+	}
+
+	public StockItemDataType getNewitem() {
+		return newitem;
+	}
+
+	public void setNewitem(StockItemDataType newitem) {
+		this.newitem = newitem;
+	}
+
+	public boolean isNewuser_adminEnabled() {
+		return newuser_adminEnabled;
+	}
+
+	public void setNewuser_adminEnabled(boolean newuser_adminEnabled) {
+		this.newuser_adminEnabled = newuser_adminEnabled;
+	}
+
+	public String getNewItem_imageName() {
+		return newItem_imageName;
+	}
+
+	public void setNewItem_imageName(String newItem_imageName) {
+		this.newItem_imageName = newItem_imageName;
 	}
 
 	public Date getDateFrom() {
