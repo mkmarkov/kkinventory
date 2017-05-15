@@ -13,6 +13,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
@@ -43,10 +44,9 @@ public class InventoryBean implements Serializable {
 	LogDataType selectedHistory = new LogDataType();
 	FacesContext context = FacesContext.getCurrentInstance();
 	boolean adminPanelEnabled = false;;
-	private boolean expandTable = false;
 	String search_ItemCode, search_ItemVariation, search_Color;
 	int search_qty;
-
+	
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
 			Iterator<LogDataType> itr = historyList.iterator();
@@ -82,8 +82,8 @@ public class InventoryBean implements Serializable {
 		root.getChildren().clear();
 		stockList = dbconn.SearchStock(search_ItemCode, search_ItemVariation, search_Color, search_qty);
 		categories = dbconn.getCategories();
-		expandTable = true;
 		loadTree();
+		RequestContext.getCurrentInstance().update("form:stocktable");
 	}
 
 	public void loadHistory() {
@@ -130,8 +130,6 @@ public class InventoryBean implements Serializable {
 			ItemCategoryDataType temp = catItr.next();
 			root.getChildren().add(new DefaultTreeNode(
 					new ItemDataType(temp.getItemCatID(), temp.getItemCategory(), temp.getItemSubcategory())));
-			if (expandTable)
-				root.getChildren().get(root.getChildren().size() - 1).setExpanded(true);
 		}
 
 		Iterator<StockItemDataType> itr = stockList.iterator();
@@ -148,7 +146,6 @@ public class InventoryBean implements Serializable {
 			}
 		}
 		calculateTotalStock();
-		expandTable = false;
 	}
 
 	public void calculateTotalStock() {

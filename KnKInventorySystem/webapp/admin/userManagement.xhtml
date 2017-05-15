@@ -16,64 +16,62 @@
 				closable="true" />
 			<p:growl id="growl" showDetail="true" autoUpdate="true" />
 
-			<p:panelGrid id="usergrid" columns="2">
-				<p:dataTable id="errorTable" var="errors"
-					value="#{userManagementBean.historyList}"
-					selection="#{userManagementBean.selectedHistory}"
-					selectionMode="single" rowKey="#{errors.logID}"
-					style="font-size:0.75em">
-					<p:column headerText="Код">
+			<p:dataTable id="errorTable" var="errors"
+				value="#{userManagementBean.historyList}"
+				selection="#{userManagementBean.selectedHistory}"
+				selectionMode="single" rowKey="#{errors.logID}"
+				style="font-size:0.75em">
+				<p:column headerText="Код">
 			#{errors.itemCode}
 			</p:column>
-					<p:column headerText="Вариация">
+				<p:column headerText="Вариация">
 			#{errors.itemVariation}
 			</p:column>
-					<p:column headerText="Наличност">
+				<p:column headerText="Наличност">
 			#{errors.quantity}
 			</p:column>
-					<p:column headerText="Служител">
+				<p:column headerText="Служител">
 			#{errors.employee}
 			</p:column>
-					<p:column headerText="Детайли на поръчката">
+				<p:column headerText="Детайли на поръчката">
 			#{errors.orderDetails}
 			</p:column>
-					<p:column headerText="Дата">
+				<p:column headerText="Дата">
 			#{errors.timestamp}
 			</p:column>
-					<f:facet name="footer">
-						<p:commandButton value="Потвърди грешка"
-							action="#{userManagementBean.approveMarkedError()}"
-							update="form:usergrid" />
-					</f:facet>
-				</p:dataTable>
-				<p:panel id="loginpanel">
-					<p:panelGrid columns="3">
-						<p:selectOneListbox value="#{userManagementBean.selectedLogin}"
-							scrollHeight="150">
-							<p:ajax partialSubmit="true" event="change"
-								update="form:usergrid" />
-							<f:selectItems value="#{userManagementBean.loginsList}" />
-						</p:selectOneListbox>
-						<p:panel>
-							<p:panelGrid columns="2">
+				<f:facet name="footer">
+					<p:commandButton value="Потвърди грешка"
+						action="#{userManagementBean.approveMarkedError()}"
+						update="form:errorTable" />
+				</f:facet>
+			</p:dataTable>
+			<p:panel id="loginpanel">
+				<p:panelGrid columns="3">
+					<p:selectOneListbox value="#{userManagementBean.selectedLogin}"
+						scrollHeight="150">
+						<p:ajax partialSubmit="true" event="change"
+							update="form:loginpanel" />
+						<f:selectItems value="#{userManagementBean.loginsList}" />
+					</p:selectOneListbox>
+					<p:panel>
+						<p:panelGrid columns="2">
 								Потребител <p:inputText binding="#{addusr}" />
 								Парола <p:inputText binding="#{addpwd}" />
-								<p:commandButton value="Добави"
-									action="#{userManagementBean.addUser(addusr.value,addpwd.value)}"
-									update="form:usergrid" />
-								<p:commandButton value="Изтрий"
-									action="#{userManagementBean.removeUser()}"
-									update="form:usergrid" />
-							</p:panelGrid>
-						</p:panel>
-						<p:panelGrid columns="2">
+							<p:commandButton value="Добави"
+								action="#{userManagementBean.addUser(addusr.value,addpwd.value)}"
+								update="form:loginpanel" />
+							<p:commandButton value="Изтрий"
+								action="#{userManagementBean.removeUser()}"
+								update="form:loginpanel" />
+						</p:panelGrid>
+					</p:panel>
+					<p:panelGrid columns="2">
 							Администраторски Достъп
 							<p:selectBooleanCheckbox
-								value="#{userManagementBean.newuser_adminEnabled}" />
-						</p:panelGrid>
+							value="#{userManagementBean.newuser_adminEnabled}" />
 					</p:panelGrid>
-				</p:panel>
-			</p:panelGrid>
+				</p:panelGrid>
+			</p:panel>
 		</h:form>
 	</ui:define>
 </ui:composition>

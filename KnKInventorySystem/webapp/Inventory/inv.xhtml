@@ -8,7 +8,8 @@
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
 		<h:form id="form" style="font-size: 0.85em">
-			<f:event type="preRenderView" listener="#{inventoryBean.init()}" />
+			<p:remoteCommand action="#{inventoryBean.init()}" autoRun="true"
+				update="form:stocktable" />
 			<p:treeTable id="stocktable" var="stock"
 				value="#{inventoryBean.root}"
 				selection="#{inventoryBean.selectedNode}" selectionMode="single"
@@ -36,7 +37,7 @@
 				<p:column headerText="Цена">
 			#{stock.item.price}
 			 	</p:column>
-				<p:column style="width:32px;text-align: center">
+				<p:column headerText="Снимка" style="text-align: center">
 					<p:commandButton update=":form:imagePanel"
 						oncomplete="PF('imageDialog').show()" icon="ui-icon-search"
 						title="View">

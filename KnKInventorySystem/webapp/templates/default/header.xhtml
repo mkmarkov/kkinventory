@@ -16,9 +16,6 @@
 				<a class="navbar-brand" href="#">Добре дошли, #{login.user}</a>
 			</div>
 			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav navbar-right">
-					<li><a href="#">Logout</a></li>
-				</ul>
 				<h:form class="navbar-form navbar-left">
 					<p:inputText styleClass="form-control" style="margin-right: 10px"
 						placeholder="Код..." value="#{inventoryBean.search_ItemCode}" />
@@ -32,6 +29,8 @@
 						value="#{inventoryBean.search_qty}" />
 					<p:commandButton value="Търси" action="#{inventoryBean.search()}"
 						style="margin-left: 10px" />
+					<p:commandButton value="Изход" action="#{login.logout()}"
+						style="float:right" />
 				</h:form>
 			</div>
 		</div>

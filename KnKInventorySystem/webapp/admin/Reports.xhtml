@@ -8,12 +8,18 @@
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
 		<h:form id="form">
-			<p:selectOneMenu value="#{adminPanelBean.reportSearchType}">
-				<f:selectItem itemValue="usr" itemLabel="Потребител" />
-				<f:selectItem itemValue="cat" itemLabel="Категория" />
-				<f:selectItem itemValue="item" itemLabel="Артикул(Код)" />
+			Тип отчет:
+			<h:selectOneMenu value="#{adminPanelBean.reportSearchType}">
+				<f:selectItem itemValue="usr" itemLabel="Потребител"
+					itemDisabled="#{!login.adminPanelEnabled}" />
+				<f:selectItem itemValue="cat" itemLabel="Категория"
+					itemDisabled="#{!login.adminPanelEnabled}" />
+				<f:selectItem itemValue="item" itemLabel="Артикул(Код)"
+					itemDisabled="#{!login.adminPanelEnabled}" />
 				<f:selectItem itemValue="order" itemlabel="Поръчка" />
-			</p:selectOneMenu>
+			</h:selectOneMenu>
+			<br />
+			<br />
 						Търсене: <p:inputText binding="#{reportInput}"
 				style="margin-bot:5px" />
 						От: <p:calendar value="#{adminPanelBean.dateFrom}"
@@ -28,6 +34,10 @@
 			<p:commandButton value="Изчисти"
 				action="#{adminPanelBean.clearReport()}" update="reportTable"
 				style="margin-left: 10px" />
+
+			<br />
+			<br />
+
 			<p:dataTable id="reportTable" var="report"
 				value="#{adminPanelBean.userReport}" scrollable="true"
 				scrollHeight="340">
