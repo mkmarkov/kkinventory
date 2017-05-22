@@ -7,40 +7,40 @@
 	xmlns:p="http://primefaces.org/ui"
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
-		<h:form id="form">
+		<h:form id="form" style="font-size: 0.85em">
 			Тип отчет:
-			<h:selectOneMenu value="#{adminPanelBean.reportSearchType}">
+			<h:selectOneMenu value="#{reportsBean.reportSearchType}">
 				<f:selectItem itemValue="usr" itemLabel="Потребител"
 					itemDisabled="#{!login.adminPanelEnabled}" />
 				<f:selectItem itemValue="cat" itemLabel="Категория"
 					itemDisabled="#{!login.adminPanelEnabled}" />
 				<f:selectItem itemValue="item" itemLabel="Артикул(Код)"
 					itemDisabled="#{!login.adminPanelEnabled}" />
-				<f:selectItem itemValue="order" itemlabel="Поръчка" />
+				<f:selectItem itemValue="order" itemLabel="Поръчка" />
 			</h:selectOneMenu>
 			<br />
 			<br />
 						Търсене: <p:inputText binding="#{reportInput}"
 				style="margin-bot:5px" />
-						От: <p:calendar value="#{adminPanelBean.dateFrom}"
-				pattern="yyyy-MM-dd" size="5">
+						От: <p:calendar value="#{reportsBean.dateFrom}"
+				pattern="yyyy-MM-dd" size="15">
 			</p:calendar>
-						До:	<p:calendar value="#{adminPanelBean.dateTo}"
-				pattern="yyyy-MM-dd" size="5">
+						До:	<p:calendar value="#{reportsBean.dateTo}" pattern="yyyy-MM-dd"
+				size="15">
 			</p:calendar>
 			<p:commandButton value="Отчет"
-				action="#{adminPanelBean.getReport(reportInput.value)}"
-				update="form:reportTable" style="margin-left: 10px" />
+				action="#{reportsBean.getReport(reportInput.value)}"
+				update="form:reportTable,form:total" style="margin-left: 10px" />
 			<p:commandButton value="Изчисти"
-				action="#{adminPanelBean.clearReport()}" update="reportTable"
-				style="margin-left: 10px" />
+				action="#{reportsBean.clearReport()}"
+				update="reportTable,form:total" style="margin-left: 10px" />
 
 			<br />
 			<br />
 
 			<p:dataTable id="reportTable" var="report"
-				value="#{adminPanelBean.userReport}" scrollable="true"
-				scrollHeight="340">
+				value="#{reportsBean.userReport}" scrollable="true"
+				scrollHeight="360" sortBy="#{report.employee}">
 				<p:ajax event="rowSelect" partialSubmit="true" />
 				<p:column headerText="Служител">
 				#{report.employee}
@@ -63,7 +63,41 @@
 				<p:column headerText="Детайли на поръчката">
 				#{report.orderDetails}
 			</p:column>
+				<p:summaryRow>
+					<p:column colspan="6" style="text-align:right">
+						Общо количество
+					</p:column>
+					<p:column>
+						<h:outputText value="#{reportsBean.total}" />
+					</p:column>
+				</p:summaryRow>
 			</p:dataTable>
+			<h3>Свали данните като:</h3>
+			<h:commandLink>
+				<p:graphicImage name="resources/images/excel.png" />
+				<p:dataExporter type="xls" target="reportTable"
+					fileName="#{reportsBean.reportSearchType}_report"/>
+			</h:commandLink>
+				
+			<h:commandLink>
+				<p:graphicImage name="resources/images/pdf.png" />
+				<p:dataExporter type="pdf" target="reportTable"
+					fileName="#{reportsBean.reportSearchType}_report"/>
+			</h:commandLink>
+
+			<h:commandLink>
+				<p:graphicImage name="resources/images/csv.png" />
+				<p:dataExporter type="csv" target="reportTable"
+					fileName="#{reportsBean.reportSearchType}_report" />
+			</h:commandLink>
+
+			<h:commandLink>
+				<p:graphicImage name="resources/images/xml.png" />
+				<p:dataExporter type="xml" target="reportTable"
+					fileName="#{reportsBean.reportSearchType}_report"/>
+			</h:commandLink>
+			<p:inputText id="total" value="#{reportsBean.total}"
+				style="margin-left:5px" rendered="false" />
 		</h:form>
 	</ui:define>
 </ui:composition>

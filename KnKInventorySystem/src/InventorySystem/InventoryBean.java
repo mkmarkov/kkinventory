@@ -46,7 +46,7 @@ public class InventoryBean implements Serializable {
 	boolean adminPanelEnabled = false;;
 	String search_ItemCode, search_ItemVariation, search_Color;
 	int search_qty;
-	
+
 	public void markHistoryAsError() {
 		if (dbconn.MarkHistoryAsError(selectedHistory.LogID)) {
 			Iterator<LogDataType> itr = historyList.iterator();
@@ -80,7 +80,7 @@ public class InventoryBean implements Serializable {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock(search_ItemCode, search_ItemVariation, search_Color, search_qty);
+		stockList = dbconn.SearchStock(search_ItemCode, search_ItemVariation, search_qty);
 		categories = dbconn.getCategories();
 		loadTree();
 		RequestContext.getCurrentInstance().update("form:stocktable");
@@ -99,7 +99,7 @@ public class InventoryBean implements Serializable {
 			stockList.clear();
 			categories.clear();
 			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "", "", 0);
+			stockList = dbconn.SearchStock("", "", 0);
 			categories = dbconn.getCategories();
 			historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
 			Iterator<LogDataType> itr = historyList.iterator();

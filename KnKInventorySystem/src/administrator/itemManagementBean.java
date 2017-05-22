@@ -70,7 +70,7 @@ public class itemManagementBean {
 			stockList.clear();
 			categories.clear();
 			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "", "", 0);
+			stockList = dbconn.SearchStock("", "", 0);
 			categories = dbconn.getCategories();
 			loadTree();
 		}
@@ -82,7 +82,7 @@ public class itemManagementBean {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
-		stockList = dbconn.SearchStock("", "", "", 0);
+		stockList = dbconn.SearchStock("", "", 0);
 		categories = dbconn.getCategories();
 		loadTree();
 	}

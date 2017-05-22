@@ -16,7 +16,7 @@ import KKDataTypes.StockItemDataType;
 
 public class DatabaseConnector {
 
-	private final String GetStockJDBCCall = "{ call getStock (?,?,?,?)}"; // ItemCode,ItemVariation,Color,Qty
+	private final String GetStockJDBCCall = "{ call getStock (?,?,?)}"; // ItemCode,ItemVariation,Qty
 	private final String AddStockJDBCCall = "{ call addStock (?,?,?,?,?,?,?)}"; // ItemCode,ItemVariation,Color,Stock,ImageName,ItemCatID,price
 	private final String deleteStock = "{ call deleteStock (?) }"; // ItemID;
 	private final String AddStockQuantityJDBCCall = "{ call addStockQuantity (?,?)}"; // ItemID,Quantity
@@ -561,15 +561,14 @@ public class DatabaseConnector {
 		return list;
 	}
 
-	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation, String Color, int qty) {
+	public List<StockItemDataType> SearchStock(String ItemCode, String ItemVariation, int qty) {
 		ConnectToDB();
 		List<StockItemDataType> list = new ArrayList<>();
 		try {
 			CallableStatement call = conn.prepareCall(GetStockJDBCCall);
 			call.setString(1, ItemCode);
 			call.setString(2, ItemVariation);
-			call.setString(3, Color);
-			call.setInt(4, qty);
+			call.setInt(3, qty);
 			ResultSet rs = call.executeQuery();
 
 			while (rs.next()) {

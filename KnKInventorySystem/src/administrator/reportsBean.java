@@ -2,6 +2,7 @@ package administrator;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
@@ -21,6 +22,7 @@ public class reportsBean {
 	public Date dateFrom;
 	public Date dateTo;
 	public String reportSearchType;
+	public int total = 0;
 
 	public void getReport(String search) {
 		java.sql.Date dTo = null;
@@ -37,10 +39,29 @@ public class reportsBean {
 			userReport = dbconn.getHistoryByItem(search, dfrom, dTo);
 		if (reportSearchType.equals("order"))
 			userReport = dbconn.getHistoryByOrder(search, dfrom, dTo);
+		if (userReport.size() > 0)
+			calculateTotal();
 	}
 
 	public void clearReport() {
 		userReport.clear();
+		total = 0;
+	}
+
+	public void calculateTotal() {
+		total = 0;
+		Iterator<LogDataType> itr = userReport.iterator();
+		while (itr.hasNext()) {
+			total += itr.next().Quantity;
+		}
+	}
+
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
 	}
 
 	public DatabaseConnector getDbconn() {
@@ -90,6 +111,5 @@ public class reportsBean {
 	public void setReportSearchType(String reportSearchType) {
 		this.reportSearchType = reportSearchType;
 	}
-	
-	
+
 }
