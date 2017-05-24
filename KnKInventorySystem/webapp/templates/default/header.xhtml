@@ -17,8 +17,9 @@
 			</div>
 			<div class="navbar-collapse collapse">
 				<h:form class="navbar-form navbar-left">
-					<p:inputText styleClass="form-control" style="margin-right: 10px"
-						placeholder="Код..." value="#{inventoryBean.search_ItemCode}" />
+					<p:inputText styleClass="form-control"
+						style="margin-right: 10px;margin-left: 50px" placeholder="Код..."
+						value="#{inventoryBean.search_ItemCode}" />
 					<p:inputText styleClass="form-control" style="margin-right: 10px"
 						placeholder="Вариация..."
 						value="#{inventoryBean.search_ItemVariation}" />
@@ -28,7 +29,7 @@
 					<p:commandButton value="Търси" action="#{inventoryBean.search()}"
 						style="margin-left: 10px" />
 					<p:commandButton value="Изход" action="#{login.logout()}"
-						style="float:right" />
+						style="margin-left: 50px " />
 				</h:form>
 			</div>
 		</div>

@@ -8,8 +8,9 @@
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
 		<h:form id="form" style="font-size: 0.85em">
+			<p:growl id="growl" showDetail="true" autoUpdate="true" />
 			<p:remoteCommand action="#{inventoryBean.init()}" autoRun="true"
-				update="form:stocktable" />
+				update="form:stocktable,form:historyTable" />
 			<p:treeTable id="stocktable" var="stock"
 				value="#{inventoryBean.root}"
 				selection="#{inventoryBean.selectedNode}" selectionMode="single"

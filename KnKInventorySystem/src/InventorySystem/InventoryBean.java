@@ -102,13 +102,6 @@ public class InventoryBean implements Serializable {
 			stockList = dbconn.SearchStock("", "", 0);
 			categories = dbconn.getCategories();
 			historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
-			Iterator<LogDataType> itr = historyList.iterator();
-			while (itr.hasNext()) {
-				LogDataType temp = itr.next();
-				String Action = temp.Action.trim();
-				if (!Action.equals("Remove"))
-					itr.remove();
-			}
 			adminPanelEnabled = dbconn.isAdminPanelEnabled(SessionUtils.getUserName());
 			loadTree();
 		}
@@ -146,6 +139,13 @@ public class InventoryBean implements Serializable {
 			}
 		}
 		calculateTotalStock();
+		Iterator<LogDataType> itr_his = historyList.iterator();
+		while (itr_his.hasNext()) {
+			LogDataType temp = itr_his.next();
+			String Action = temp.Action.trim();
+			if (!Action.equals("Remove"))
+				itr_his.remove();
+		}
 	}
 
 	public void calculateTotalStock() {

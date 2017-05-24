@@ -8,6 +8,7 @@
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
 		<h:form id="form" style="font-size: 0.85em">
+			<p:growl id="growl" showDetail="true" autoUpdate="true" />
 			Тип отчет:
 			<h:selectOneMenu value="#{reportsBean.reportSearchType}">
 				<f:selectItem itemValue="usr" itemLabel="Потребител"
@@ -74,27 +75,14 @@
 			</p:dataTable>
 			<h3>Свали данните като:</h3>
 			<h:commandLink>
-				<p:graphicImage name="resources/images/excel.png" />
+				<p:graphicImage name="images/excel.png" />
 				<p:dataExporter type="xls" target="reportTable"
-					fileName="#{reportsBean.reportSearchType}_report"/>
-			</h:commandLink>
-				
-			<h:commandLink>
-				<p:graphicImage name="resources/images/pdf.png" />
-				<p:dataExporter type="pdf" target="reportTable"
-					fileName="#{reportsBean.reportSearchType}_report"/>
-			</h:commandLink>
-
-			<h:commandLink>
-				<p:graphicImage name="resources/images/csv.png" />
-				<p:dataExporter type="csv" target="reportTable"
 					fileName="#{reportsBean.reportSearchType}_report" />
 			</h:commandLink>
-
 			<h:commandLink>
-				<p:graphicImage name="resources/images/xml.png" />
-				<p:dataExporter type="xml" target="reportTable"
-					fileName="#{reportsBean.reportSearchType}_report"/>
+				<p:graphicImage name="images/pdf.png" />
+				<p:dataExporter type="pdf" target="reportTable"
+					fileName="#{reportsBean.reportSearchType}_report" />
 			</h:commandLink>
 			<p:inputText id="total" value="#{reportsBean.total}"
 				style="margin-left:5px" rendered="false" />
