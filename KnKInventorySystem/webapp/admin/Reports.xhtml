@@ -79,11 +79,6 @@
 				<p:dataExporter type="xls" target="reportTable"
 					fileName="#{reportsBean.reportSearchType}_report" />
 			</h:commandLink>
-			<h:commandLink>
-				<p:graphicImage name="images/pdf.png" />
-				<p:dataExporter type="pdf" target="reportTable"
-					fileName="#{reportsBean.reportSearchType}_report" />
-			</h:commandLink>
 			<p:inputText id="total" value="#{reportsBean.total}"
 				style="margin-left:5px" rendered="false" />
 		</h:form>
