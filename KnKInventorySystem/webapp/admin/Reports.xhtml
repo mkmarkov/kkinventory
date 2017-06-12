@@ -39,7 +39,7 @@
 			<br />
 			<br />
 
-			<p:dataTable id="reportTable" var="report"
+			<p:dataTable id="reportTable" var="report" widgetVar="reportTable_widget"
 				value="#{reportsBean.userReport}" scrollable="true"
 				scrollHeight="360" sortBy="#{report.employee}">
 				<p:ajax event="rowSelect" partialSubmit="true" />
@@ -77,7 +77,7 @@
 			<h:commandLink>
 				<p:graphicImage name="images/excel.png" />
 				<p:dataExporter type="xls" target="reportTable"
-					fileName="#{reportsBean.reportSearchType}_report" />
+					fileName="#{reportsBean.reportSearchType}_report" postProcessor="#{reportsBean.generateExcel}" />
 			</h:commandLink>
 			<p:inputText id="total" value="#{reportsBean.total}"
 				style="margin-left:5px" rendered="false" />
