@@ -64,7 +64,7 @@ public class itemManagementBean {
 			SessionUtils.getSession().invalidate();
 			return;
 		}
-		if (stockList.isEmpty()) {
+//		if (stockList.isEmpty()) {
 			historyList = dbconn.getUserHistory_error();
 			loginsList = dbconn.getLogins_all();
 			stockList.clear();
@@ -73,7 +73,7 @@ public class itemManagementBean {
 			stockList = dbconn.SearchStock("", "", 0);
 			categories = dbconn.getCategories();
 			loadTree();
-		}
+//		}
 	}
 
 	public void reload() {
@@ -131,8 +131,8 @@ public class itemManagementBean {
 			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
 			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
 			if (doResize) {
-				int height = Integer.valueOf(InventoryConfig.prop.getProperty("resizeHeight"));
-				int width = Integer.valueOf(InventoryConfig.prop.getProperty("resizeWidth"));
+				int height = (int) Math.round(Double.valueOf(InventoryConfig.prop.getProperty("resizeHeightPercent"))*image.getHeight());
+				int width = (int) Math.round(Double.valueOf(InventoryConfig.prop.getProperty("resizeWidthPercent"))*image.getWidth());
 				ResampleOp resample = new ResampleOp(height, width);
 				image = resample.filter(image, null);
 			}

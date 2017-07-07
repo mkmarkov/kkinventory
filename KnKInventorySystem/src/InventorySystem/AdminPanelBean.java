@@ -67,7 +67,7 @@ public class AdminPanelBean implements Serializable {
 			SessionUtils.getSession().invalidate();
 			return;
 		}
-		if (stockList.isEmpty()) {
+//		if (stockList.isEmpty()) {
 			historyList = dbconn.getUserHistory_error();
 			loginsList = dbconn.getLogins_all();
 			stockList.clear();
@@ -76,7 +76,7 @@ public class AdminPanelBean implements Serializable {
 			stockList = dbconn.SearchStock("", "", 0);
 			categories = dbconn.getCategories();
 			loadTree();
-		}
+//		}
 	}
 
 	public void reload() {
@@ -267,8 +267,8 @@ public class AdminPanelBean implements Serializable {
 			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
 			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
 			if (doResize) {
-				int height = Integer.valueOf(InventoryConfig.prop.getProperty("resizeHeight"));
-				int width = Integer.valueOf(InventoryConfig.prop.getProperty("resizeWidth"));
+				int height = Integer.valueOf(InventoryConfig.prop.getProperty("resizeHeight"))*image.getHeight();
+				int width = Integer.valueOf(InventoryConfig.prop.getProperty("resizeWidth"))*image.getWidth();
 				ResampleOp resample = new ResampleOp(height, width);
 				image = resample.filter(image, null);
 			}
