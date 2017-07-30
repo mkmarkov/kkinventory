@@ -10,6 +10,7 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
@@ -47,8 +48,12 @@ public class InventoryBean implements Serializable {
 	String search_ItemCode, search_ItemVariation, search_Color;
 	int search_qty;
 
+	public void rowindex (int indedx)
+	{
+		System.out.println(indedx);
+	}
 	public void init() {
-		// if (stockList.isEmpty()) {
+		 if (stockList.isEmpty()) {
 		stockList.clear();
 		categories.clear();
 		root.getChildren().clear();
@@ -57,7 +62,16 @@ public class InventoryBean implements Serializable {
 		historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
 		adminPanelEnabled = dbconn.isAdminPanelEnabled(SessionUtils.getUserName());
 		loadTree();
-		// }
+		}
+	}
+
+	public void expandRow() {
+		if (selectedItem.getItem().getItemCode() == null)
+			if (selectedNode.isExpanded() == false) {
+				selectedNode.setExpanded(true);
+			} else {
+				selectedNode.setExpanded(false);
+			}
 	}
 
 	public void markHistoryAsError() {
@@ -105,6 +119,7 @@ public class InventoryBean implements Serializable {
 
 	public void setselected() {
 		selectedItem = (ItemDataType) selectedNode.getData();
+		expandRow();
 	}
 
 	public boolean isAdminPanelEnabled() {
@@ -168,10 +183,10 @@ public class InventoryBean implements Serializable {
 		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
 			return new DefaultStreamedContent();
 		} else {
-			String filepath = InventoryConfig.prop.getProperty("downloadPath");
+			String filepath = InventoryConfig.prop.getProperty("downloadPath")+ selectedItem.getItem().ImageName;
 			try {
 				return new DefaultStreamedContent(
-						new FileInputStream(new File(filepath, selectedItem.getItem().ImageName)));
+						new FileInputStream(new File(filepath)));
 			} catch (Exception e) {
 				System.out.println("Error streaming image");
 			}

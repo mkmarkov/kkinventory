@@ -11,12 +11,12 @@
 			<p:growl id="growl" showDetail="true" autoUpdate="true" />
 			<p:remoteCommand action="#{inventoryBean.init()}" autoRun="true"
 				update="form:stocktable,form:historyTable" />
-			<p:treeTable id="stocktable" var="stock"
+			<p:treeTable id="stocktable" var="stock" rowIndexVar="rowID"
 				value="#{inventoryBean.root}"
 				selection="#{inventoryBean.selectedNode}" selectionMode="single"
 				rowKey="#{stock.itemID}" scrollable="true" scrollHeight="350">
 				<p:ajax event="select" listener="#{inventoryBean.setselected()}"
-					update="form:removestockpanel" />
+					process="@this" update="form:stocktable,form:removestockpanel" />
 				<p:column headerText="Категория" styleClass="togglerClass">
 			#{stock.cat.itemCategory}
 			 	</p:column>

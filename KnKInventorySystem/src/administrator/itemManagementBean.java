@@ -32,6 +32,7 @@ import KKDataTypes.ItemDataType;
 import KKDataTypes.LogDataType;
 import KKDataTypes.Logins;
 import KKDataTypes.StockItemDataType;
+import login.Login;
 import login.SessionUtils;
 
 @ManagedBean
@@ -54,7 +55,7 @@ public class itemManagementBean {
 	FacesContext context = FacesContext.getCurrentInstance();
 	StockItemDataType newitem = new StockItemDataType();
 	public boolean newuser_adminEnabled;
-	private String newItem_imageName = "";
+	private String newItem_imageName = "NA.jpg";
 	public Date dateFrom;
 	public Date dateTo;
 	public String reportSearchType;
@@ -64,16 +65,16 @@ public class itemManagementBean {
 			SessionUtils.getSession().invalidate();
 			return;
 		}
-//		if (stockList.isEmpty()) {
-			historyList = dbconn.getUserHistory_error();
-			loginsList = dbconn.getLogins_all();
-			stockList.clear();
-			categories.clear();
-			root.getChildren().clear();
-			stockList = dbconn.SearchStock("", "", 0);
-			categories = dbconn.getCategories();
-			loadTree();
-//		}
+		// if (stockList.isEmpty()) {
+		historyList = dbconn.getUserHistory_error();
+		loginsList = dbconn.getLogins_all();
+		stockList.clear();
+		categories.clear();
+		root.getChildren().clear();
+		stockList = dbconn.SearchStock("", "", 0);
+		categories = dbconn.getCategories();
+		loadTree();
+		// }
 	}
 
 	public void reload() {
@@ -131,8 +132,10 @@ public class itemManagementBean {
 			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
 			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
 			if (doResize) {
-				int height = (int) Math.round(Double.valueOf(InventoryConfig.prop.getProperty("resizeHeightPercent"))*image.getHeight());
-				int width = (int) Math.round(Double.valueOf(InventoryConfig.prop.getProperty("resizeWidthPercent"))*image.getWidth());
+				int height = (int) Math.round(
+						Double.valueOf(InventoryConfig.prop.getProperty("resizeHeightPercent")) * image.getHeight());
+				int width = (int) Math.round(
+						Double.valueOf(InventoryConfig.prop.getProperty("resizeWidthPercent")) * image.getWidth());
 				ResampleOp resample = new ResampleOp(height, width);
 				image = resample.filter(image, null);
 			}
@@ -145,14 +148,39 @@ public class itemManagementBean {
 		}
 	}
 
+	public void upload_edit(FileUploadEvent event) {
+		try {
+			UploadedFile uploadedFile = event.getFile();
+			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
+			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
+			if (doResize) {
+				int height = (int) Math.round(
+						Double.valueOf(InventoryConfig.prop.getProperty("resizeHeightPercent")) * image.getHeight());
+				int width = (int) Math.round(
+						Double.valueOf(InventoryConfig.prop.getProperty("resizeWidthPercent")) * image.getWidth());
+				ResampleOp resample = new ResampleOp(height, width);
+				image = resample.filter(image, null);
+			}
+			selectedItem.getItem().setImageName(uploadedFile.getFileName());
+			String downloadPath = InventoryConfig.prop.getProperty("downloadPath") + uploadedFile.getFileName();
+			System.out.println(downloadPath);
+			ImageIO.write(image, "jpg", new File(downloadPath));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void setselected() {
 		selectedItem = (ItemDataType) selectedNode.getData();
 	}
 
-	public void addStockQuantity(int Quantity, String Employee) {
-		if (dbconn.AddStockQuantity(selectedItem.getItem().ItemID, Quantity))
-			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
-					selectedItem.getItem().ItemCategory, Quantity, "", "Add", selectedItem.getItem().ItemID);
+	public void editItem() {
+		if (dbconn.editItem(selectedItem.getItem().ItemID, selectedItem.getItem().ItemCode,
+				selectedItem.getItem().ItemVariation, selectedItem.getItem().ItemCategory, selectedItem.getItem().Stock,
+				selectedItem.getItem().price, selectedItem.getItem().ImageName))
+			dbconn.addUserHistory(SessionUtils.getUserName(), selectedItem.getItem().ItemCode,
+					selectedItem.getItem().ItemVariation, selectedItem.getItem().ItemCategory,
+					selectedItem.getItem().Stock, "", "editItem", selectedItem.getItem().ItemID);
 		else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
@@ -160,15 +188,22 @@ public class itemManagementBean {
 		reload();
 	}
 
-	public StreamedContent getImage() throws IOException {
+	public StreamedContent getImage() {
+//		if(selectedItem.getItem().getImageName().isEmpty())
+//			return null;
 		FacesContext context = FacesContext.getCurrentInstance();
-
 		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
 			return new DefaultStreamedContent();
 		} else {
-			return new DefaultStreamedContent(new FileInputStream(
-					new File(InventoryConfig.prop.getProperty("downloadPath"), selectedItem.getItem().ImageName)));
+			String filepath = InventoryConfig.prop.getProperty("downloadPath");
+			try {
+				return new DefaultStreamedContent(
+						new FileInputStream(new File(filepath, selectedItem.getItem().ImageName)));
+			} catch (Exception e) {
+				System.out.println("Error streaming image");
+			}
 		}
+		return null;
 	}
 
 	public void deleteStock(String Employee) {
@@ -199,6 +234,7 @@ public class itemManagementBean {
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
 		}
 		newitem = new StockItemDataType();
+		newItem_imageName="NA.jpg";
 		reload();
 	}
 
@@ -226,7 +262,7 @@ public class itemManagementBean {
 			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
 		}
 	}
-
+ 
 	/////////////////////// SETTERS/GETTERS/////////////
 	public TreeNode getSelectedNode() {
 		return selectedNode;

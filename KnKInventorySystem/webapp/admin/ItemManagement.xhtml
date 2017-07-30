@@ -9,12 +9,13 @@
 	<ui:define name="content">
 		<h:form id="form" style="font-size:0.8em">
 			<f:metadata>
-				<f:event type="preRenderView" listener="#{itemManagementBean.init()}" />
+				<f:event type="preRenderView"
+					listener="#{itemManagementBean.init()}" />
 			</f:metadata>
 			<p:growl id="growl" showDetail="true" autoUpdate="true" />
 			<p:messages id="messages" showDetail="true" autoUpdate="true"
 				closable="true" />
-				
+
 			<p:panelGrid id="stockpnlgrid" columns="2">
 				<p:treeTable id="stocktable" var="stock"
 					value="#{itemManagementBean.root}"
@@ -43,20 +44,28 @@
 
 				<p:panel id="AddStockQuantitypanel" header="Опции за артикул">
 					<p:panelGrid columns="2">
+		Категория
+		<p:selectOneMenu
+							value="#{itemManagementBean.selectedItem.item.itemCategory}">
+							<f:selectItems value="#{itemManagementBean.categories}" />
+						</p:selectOneMenu>
 		Код
-		<p:inputText value="#{itemManagementBean.selectedItem.item.itemCode}"
-							readonly="true" disabled="true" />
+		<p:inputText value="#{itemManagementBean.selectedItem.item.itemCode}" />
 		Вариация
 		<p:inputText
-							value="#{itemManagementBean.selectedItem.item.itemVariation}"
-							readonly="true" disabled="true" />
+							value="#{itemManagementBean.selectedItem.item.itemVariation}" />
 		Наличност
-		<p:inputText value="#{itemManagementBean.selectedItem.item.stock}"
-							readonly="true" disabled="true" />
-		Количество
-		<p:inputText binding="#{qty}" type="number" />
-						<p:commandButton value="Добави"
-							action="#{itemManagementBean.addStockQuantity(qty.value,login.user)}"
+		<p:inputText value="#{itemManagementBean.selectedItem.item.stock}" type="number"/>
+		Цена
+		<p:inputText value="#{itemManagementBean.selectedItem.item.price}"
+							type="number" />
+						<p:commandButton value="Виж Снимката"
+							oncomplete="PF('imageDialog').show()" update=":form:imagePanel"/>
+						<p:fileUpload
+							fileUploadListener="#{itemManagementBean.upload_edit}"
+							auto="true" skinSimple="true" />
+						<p:commandButton value="Промени"
+							action="#{itemManagementBean.editItem()}"
 							update="form:stockpnlgrid" />
 						<p:commandButton value="Изтрий"
 							action="#{itemManagementBean.deleteStock(login.user)}"
@@ -76,7 +85,7 @@
 							<f:selectItems value="#{itemManagementBean.categories}" />
 						</p:selectOneMenu>
 		Цена
-		<p:inputNumber value="#{itemManagementBean.newitem.price}" />
+		<p:inputNumber value="#{itemManagementBean.newitem.price}" type="number"/>
 		Наличност
 		<p:inputText value="#{itemManagementBean.newitem.stock}" type="number" />
 						<p:commandButton value="Добави	"
@@ -104,6 +113,26 @@
 					</p:panelGrid>
 				</p:panel>
 			</p:panelGrid>
+			<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog"
+				resizable="false" size="300">
+				<p:graphicImage value="#{itemManagementBean.image}">
+					<f:param name="filename"
+						value="#{itemManagementBean.selectedItem.item.imageName}" height="200"
+						width="200" />
+				</p:graphicImage>
+				<p:panelGrid columns="2">
+				Код:
+				<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
+				Вариация:
+				<h:outputText
+						value="#{inventoryBean.selectedItem.item.itemVariation}" />
+				Цвят:
+				<h:outputText vallue="#{inventoryBean.selectedItem.item.color}" />
+				Категория:
+				<h:outputText
+						value="#{inventoryBean.selectedItem.item.itemCategory}" />
+				</p:panelGrid>
+			</p:dialog>
 		</h:form>
 	</ui:define>
 </ui:composition>

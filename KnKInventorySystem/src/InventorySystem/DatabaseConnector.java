@@ -38,6 +38,7 @@ public class DatabaseConnector {
 	private final String removeLogin = "{ call removeLogin (?) }";
 	private final String getLogins_all = "{ call getLogins_all }";
 	private final String getRights = "{ call getRights (?) }";
+	private final String editItem = "{ call updateItem(?,?,?,?,?,?,?)}";
 	Connection conn;
 
 	public void ConnectToDB() {
@@ -99,7 +100,34 @@ public class DatabaseConnector {
 		}
 		return temp;
 	}
-
+	
+	public Boolean editItem(int ItemID, String ItemCode,String ItemVariation, String ItemCategory,int Quantity, double price, String ImageName) {
+		ConnectToDB();
+		try {
+			CallableStatement call = conn.prepareCall(editItem);
+			call.setInt(1,ItemID);
+			call.setString(2, ItemCode);
+			call.setString(3, ItemVariation);
+			call.setString(4, ItemCategory);
+			call.setDouble(5, price);
+			call.setDouble(6, Quantity);
+			call.setString(7, ImageName);
+			call.executeUpdate();
+			if (call.getUpdateCount() >= 1)
+				return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
 	public Boolean addLogin(String Username, String Password, int AdminPanelEnabled) {
 		ConnectToDB();
 		try {
@@ -381,7 +409,7 @@ public class DatabaseConnector {
 		}
 		return list;
 	}
-	
+
 	public List<LogDataType> getHistoryByOrder(String Order, Date DateFrom, Date DateTo) {
 		ConnectToDB();
 		List<LogDataType> list = new ArrayList<>();
