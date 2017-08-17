@@ -8,6 +8,8 @@
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
 		<h:form id="form" style="font-size: 0.85em">
+			<p:hotkey bind="esc" handler="closeAll()"/>
+			<p:remoteCommand name="closeAll" onsuccess="PF('imageDialog').hide()"/>
 			<p:growl id="growl" showDetail="true" autoUpdate="true" />
 			<p:remoteCommand action="#{inventoryBean.init()}" autoRun="true"
 				update="form:stocktable,form:historyTable" />
@@ -17,7 +19,7 @@
 				rowKey="#{stock.itemID}" scrollable="true" scrollHeight="350">
 				<p:ajax event="select" listener="#{inventoryBean.setselected()}"
 					process="@this" update="form:stocktable,form:removestockpanel" />
-				<p:column headerText="Категория" styleClass="togglerClass">
+				<p:column headerText="Категория" >
 			#{stock.cat.itemCategory}
 			 	</p:column>
 				<p:column headerText="Код">
@@ -26,16 +28,13 @@
 				<p:column headerText="Вариация">
 			#{stock.item.itemVariation}
 			 	</p:column>
-				<p:column headerText="Категория">
-			#{stock.item.itemCategory}
-			 	</p:column>
-				<p:column headerText="Наличност" style="text-align:right">
+				<p:column headerText="Наличност" style="text-align:right; width:100px;">
 			#{stock.item.stock}
 			 	</p:column>
-				<p:column headerText="Цена" style="text-align:right">
+				<p:column headerText="Цена" style="text-align:right; width:100px;">
 			#{stock.item.price}
 			 	</p:column>
-				<p:column headerText="Снимка" style="text-align: center">
+				<p:column headerText="Снимка" style="text-align: center; width:100px;">
 					<p:commandButton update=":form:imagePanel"
 						oncomplete="PF('imageDialog').show()" icon="ui-icon-search"
 						title="View">

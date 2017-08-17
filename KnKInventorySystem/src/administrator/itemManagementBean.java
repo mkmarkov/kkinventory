@@ -3,7 +3,7 @@ package administrator;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -32,13 +32,16 @@ import KKDataTypes.ItemDataType;
 import KKDataTypes.LogDataType;
 import KKDataTypes.Logins;
 import KKDataTypes.StockItemDataType;
-import login.Login;
 import login.SessionUtils;
 
 @ManagedBean
 @SessionScoped
-public class itemManagementBean {
+public class itemManagementBean implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	TreeNode selectedNode = new DefaultTreeNode();
 	TreeNode root = new DefaultTreeNode();
 	List<LogDataType> historyList = new ArrayList<>();
@@ -59,6 +62,8 @@ public class itemManagementBean {
 	public Date dateFrom;
 	public Date dateTo;
 	public String reportSearchType;
+	private UploadedFile file;
+	private UploadedFile editFile;
 
 	public void init() {
 		if (!SessionUtils.getAdminPanelRights()) {
@@ -126,47 +131,43 @@ public class itemManagementBean {
 		}
 	}
 
-	public void upload(FileUploadEvent event) {
+	public void upload() {
 		try {
-			UploadedFile uploadedFile = event.getFile();
-			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
+			BufferedImage image = ImageIO.read(file.getInputstream());
 			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
+			int resizeHeight = Integer.valueOf(InventoryConfig.prop.getProperty("resizeHeight"));
+			double resizeWidthCoef = image.getHeight() / resizeHeight;
 			if (doResize) {
-				int height = (int) Math.round(
-						Double.valueOf(InventoryConfig.prop.getProperty("resizeHeightPercent")) * image.getHeight());
-				int width = (int) Math.round(
-						Double.valueOf(InventoryConfig.prop.getProperty("resizeWidthPercent")) * image.getWidth());
-				ResampleOp resample = new ResampleOp(height, width);
+				ResampleOp resample = new ResampleOp((int) (image.getWidth() / resizeWidthCoef), resizeHeight);
 				image = resample.filter(image, null);
 			}
-			newItem_imageName = uploadedFile.getFileName();
-			String downloadPath = InventoryConfig.prop.getProperty("downloadPath") + uploadedFile.getFileName();
-			System.out.println(downloadPath);
+			newItem_imageName = file.getFileName();
+			String downloadPath = InventoryConfig.prop.getProperty("downloadPath") + file.getFileName();
 			ImageIO.write(image, "jpg", new File(downloadPath));
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			file = null;
 		}
 	}
 
-	public void upload_edit(FileUploadEvent event) {
+	public void upload_edit() {
 		try {
-			UploadedFile uploadedFile = event.getFile();
-			BufferedImage image = ImageIO.read(uploadedFile.getInputstream());
+			BufferedImage image = ImageIO.read(editFile.getInputstream());
 			boolean doResize = Boolean.valueOf(InventoryConfig.prop.getProperty("resizeImage"));
+			int resizeHeight = Integer.valueOf(InventoryConfig.prop.getProperty("resizeHeight"));
+			double resizeWidthCoef = image.getHeight() / resizeHeight;
 			if (doResize) {
-				int height = (int) Math.round(
-						Double.valueOf(InventoryConfig.prop.getProperty("resizeHeightPercent")) * image.getHeight());
-				int width = (int) Math.round(
-						Double.valueOf(InventoryConfig.prop.getProperty("resizeWidthPercent")) * image.getWidth());
-				ResampleOp resample = new ResampleOp(height, width);
+				ResampleOp resample = new ResampleOp((int) (image.getWidth() / resizeWidthCoef), resizeHeight);
 				image = resample.filter(image, null);
 			}
-			selectedItem.getItem().setImageName(uploadedFile.getFileName());
-			String downloadPath = InventoryConfig.prop.getProperty("downloadPath") + uploadedFile.getFileName();
-			System.out.println(downloadPath);
+			selectedItem.getItem().ImageName = editFile.getFileName();
+			String downloadPath = InventoryConfig.prop.getProperty("downloadPath") + editFile.getFileName();
 			ImageIO.write(image, "jpg", new File(downloadPath));
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			editFile = null;
 		}
 	}
 
@@ -175,13 +176,16 @@ public class itemManagementBean {
 	}
 
 	public void editItem() {
+		if (editFile != null)
+			upload_edit();
 		if (dbconn.editItem(selectedItem.getItem().ItemID, selectedItem.getItem().ItemCode,
 				selectedItem.getItem().ItemVariation, selectedItem.getItem().ItemCategory, selectedItem.getItem().Stock,
-				selectedItem.getItem().price, selectedItem.getItem().ImageName))
+				selectedItem.getItem().price, selectedItem.getItem().ImageName)) {
 			dbconn.addUserHistory(SessionUtils.getUserName(), selectedItem.getItem().ItemCode,
 					selectedItem.getItem().ItemVariation, selectedItem.getItem().ItemCategory,
 					selectedItem.getItem().Stock, "", "editItem", selectedItem.getItem().ItemID);
-		else {
+
+		} else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на наличност", ""));
 		}
@@ -189,8 +193,6 @@ public class itemManagementBean {
 	}
 
 	public StreamedContent getImage() {
-//		if(selectedItem.getItem().getImageName().isEmpty())
-//			return null;
 		FacesContext context = FacesContext.getCurrentInstance();
 		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
 			return new DefaultStreamedContent();
@@ -224,24 +226,27 @@ public class itemManagementBean {
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
 			return;
 		}
-
+		if (file != null)
+			upload();
+		else
+			newitem.ImageName = "NA.jpg";
 		if (dbconn.AddStock(newitem.ItemCode, newitem.ItemVariation, newitem.Color, newitem.Stock, newItem_imageName,
-				newitem.price, newitem.ItemCategory))
+				newitem.price, newitem.ItemCategory)) {
 			dbconn.addUserHistory(SessionUtils.getUserName(), newitem.ItemCode, newitem.ItemVariation,
 					newitem.ItemCategory, newitem.Stock, "", "NEWITEM", 0);
-		else {
+		} else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на артикул", ""));
 		}
 		newitem = new StockItemDataType();
-		newItem_imageName="NA.jpg";
+		newItem_imageName = "NA.jpg";
 		reload();
 	}
 
 	public void addCategory(String Category) {
-		if (dbconn.AddCategory(Category, Category))
+		if (dbconn.AddCategory(Category, Category, categories.size() + 1)) {
 			categories = dbconn.getCategories();
-		else {
+		} else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на категория", ""));
 		}
@@ -262,8 +267,9 @@ public class itemManagementBean {
 			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
 		}
 	}
- 
+
 	/////////////////////// SETTERS/GETTERS/////////////
+
 	public TreeNode getSelectedNode() {
 		return selectedNode;
 	}
@@ -314,10 +320,6 @@ public class itemManagementBean {
 
 	public List<ItemCategoryDataType> getCategories() {
 		return categories;
-	}
-
-	public void setCategories(List<ItemCategoryDataType> categories) {
-		this.categories = categories;
 	}
 
 	public List<StockItemDataType> getStockList() {
@@ -424,4 +426,21 @@ public class itemManagementBean {
 		this.reportSearchType = reportSearchType;
 	}
 
+	public UploadedFile getFile() {
+		return file;
+	}
+
+	public void setFile(UploadedFile file) {
+		if (this.file == null)
+			this.file = file;
+	}
+
+	public UploadedFile getEditFile() {
+		return editFile;
+	}
+
+	public void setEditFile(UploadedFile file) {
+		if (this.file == null)
+			this.editFile = file;
+	}
 }

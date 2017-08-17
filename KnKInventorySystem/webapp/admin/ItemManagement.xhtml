@@ -7,7 +7,8 @@
 	xmlns:p="http://primefaces.org/ui"
 	template="/templates/default/main.xhtml">
 	<ui:define name="content">
-		<h:form id="form" style="font-size:0.8em">
+		<h:form id="form" style="font-size:0.8em"
+			enctype="multipart/form-data">
 			<f:metadata>
 				<f:event type="preRenderView"
 					listener="#{itemManagementBean.init()}" />
@@ -17,9 +18,8 @@
 				closable="true" />
 
 			<p:panelGrid id="stockpnlgrid" columns="2">
-				<p:treeTable id="stocktable" var="stock"
-					value="#{itemManagementBean.root}"
-					selection="#{itemManagementBean.selectedNode}"
+				<p:treeTable id="stocktable" value="#{itemManagementBean.root}"
+					selection="#{itemManagementBean.selectedNode}" var="stock"
 					selectionMode="single" rowKey="#{stock.itemID}" scrollable="true"
 					scrollHeight="300">
 					<p:ajax event="select"
@@ -43,56 +43,64 @@
 				</p:treeTable>
 
 				<p:panel id="AddStockQuantitypanel" header="Опции за артикул">
-					<p:panelGrid columns="2">
-		Категория
-		<p:selectOneMenu
+					<p:panelGrid id="editPanel" columns="2">
+						<h:outputText value="Код" />
+						<h:selectOneMenu id="edit_cat"
 							value="#{itemManagementBean.selectedItem.item.itemCategory}">
 							<f:selectItems value="#{itemManagementBean.categories}" />
-						</p:selectOneMenu>
-		Код
-		<p:inputText value="#{itemManagementBean.selectedItem.item.itemCode}" />
-		Вариация
-		<p:inputText
+						</h:selectOneMenu>
+						<h:outputText value="Код" />
+						<p:inputText id="edit_code"
+							value="#{itemManagementBean.selectedItem.item.itemCode}" />
+						<h:outputText value="Код" />
+						<p:inputText id="edit_var"
 							value="#{itemManagementBean.selectedItem.item.itemVariation}" />
-		Наличност
-		<p:inputText value="#{itemManagementBean.selectedItem.item.stock}" type="number"/>
-		Цена
-		<p:inputText value="#{itemManagementBean.selectedItem.item.price}"
+						<h:outputText value="Код" />
+						<p:inputText id="edit_stock"
+							value="#{itemManagementBean.selectedItem.item.stock}"
 							type="number" />
+						<h:outputText value="Код" />
+						<p:inputText id="edit_price"
+							value="#{itemManagementBean.selectedItem.item.price}"
+							type="number" />
+						<p:fileUpload id="editupload"
+							value="#{itemManagementBean.editFile}" mode="simple"
+							skinSimple="true" />
 						<p:commandButton value="Виж Снимката"
-							oncomplete="PF('imageDialog').show()" update=":form:imagePanel"/>
-						<p:fileUpload
-							fileUploadListener="#{itemManagementBean.upload_edit}"
-							auto="true" skinSimple="true" />
+							oncomplete="PF('imageDialog').show()"
+							 update=":form:imagePanel" />
 						<p:commandButton value="Промени"
-							action="#{itemManagementBean.editItem()}"
+							action="#{itemManagementBean.editItem()}" ajax="false"
 							update="form:stockpnlgrid" />
 						<p:commandButton value="Изтрий"
 							action="#{itemManagementBean.deleteStock(login.user)}"
 							update="form:stockpnlgrid" />
 					</p:panelGrid>
 				</p:panel>
-
 				<p:panel id="addStock" header="Добавяне на арткул"
 					style="width:450px">
 					<p:panelGrid columns="2">
-		Код
-		<p:inputText value="#{itemManagementBean.newitem.itemCode}" />
-		Вариация
-		<p:inputText value="#{itemManagementBean.newitem.itemVariation}" />
-		Категория
-		<p:selectOneMenu value="#{itemManagementBean.newitem.itemCategory}">
+						<h:outputText value="Код" />
+						<p:inputText value="#{itemManagementBean.newitem.itemCode}" />
+						<h:outputText value="Вариация" />
+						<p:inputText value="#{itemManagementBean.newitem.itemVariation}" />
+						<h:outputText value="Категория" />
+						<h:selectOneMenu
+							value="#{itemManagementBean.newitem.itemCategory}">
 							<f:selectItems value="#{itemManagementBean.categories}" />
-						</p:selectOneMenu>
-		Цена
-		<p:inputNumber value="#{itemManagementBean.newitem.price}" type="number"/>
-		Наличност
-		<p:inputText value="#{itemManagementBean.newitem.stock}" type="number" />
-						<p:commandButton value="Добави	"
-							action="#{itemManagementBean.addStock()}" update="stockpnlgrid" />
-						<p:fileUpload fileUploadListener="#{itemManagementBean.upload}"
-							auto="true" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
-							mode="advanced" skinSimple="true" />
+						</h:selectOneMenu>
+						<h:outputText value="Цена" />
+						<p:inputNumber value="#{itemManagementBean.newitem.price}"
+							type="number" />
+						<h:outputText value="Количество" />
+						<p:inputText value="#{itemManagementBean.newitem.stock}"
+							type="number" />
+						<p:commandButton value="Добави"
+							action="#{itemManagementBean.addStock()}" ajax="false"
+							update="form:stockpnlgrid">
+						</p:commandButton>
+						<p:fileUpload id="newupload" value="#{itemManagementBean.file}"
+							mode="simple" skinSimple="true" />
 					</p:panelGrid>
 				</p:panel>
 				<p:panel id="catpanel" header="Управление на категории"
@@ -115,21 +123,21 @@
 			</p:panelGrid>
 			<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog"
 				resizable="false" size="300">
-				<p:graphicImage value="#{itemManagementBean.image}">
+				<p:graphicImage
+					value="#{itemManagementBean.image}">
 					<f:param name="filename"
-						value="#{itemManagementBean.selectedItem.item.imageName}" height="200"
-						width="200" />
+						value="#{itemManagementBean.selectedItem.item.imageName}" />
 				</p:graphicImage>
 				<p:panelGrid columns="2">
-				Код:
-				<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
-				Вариация:
-				<h:outputText
+					<h:outputText value="Код" />
+					<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
+					<h:outputText value="Код" />
+					<h:outputText
 						value="#{inventoryBean.selectedItem.item.itemVariation}" />
-				Цвят:
-				<h:outputText vallue="#{inventoryBean.selectedItem.item.color}" />
-				Категория:
-				<h:outputText
+					<h:outputText value="Код" />
+					<h:outputText vallue="#{inventoryBean.selectedItem.item.color}" />
+					<h:outputText value="Код" />
+					<h:outputText
 						value="#{inventoryBean.selectedItem.item.itemCategory}" />
 				</p:panelGrid>
 			</p:dialog>

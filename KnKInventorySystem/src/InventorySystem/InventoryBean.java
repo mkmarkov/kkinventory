@@ -10,7 +10,6 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
@@ -63,6 +62,16 @@ public class InventoryBean implements Serializable {
 		adminPanelEnabled = dbconn.isAdminPanelEnabled(SessionUtils.getUserName());
 		loadTree();
 		}
+	}
+	public void refresh() {
+		stockList.clear();
+		categories.clear();
+		root.getChildren().clear();
+		stockList = dbconn.SearchStock("", "", 0);
+		categories = dbconn.getCategories();
+		historyList = dbconn.getUserHistory(SessionUtils.getUserName(), null, null);
+		adminPanelEnabled = dbconn.isAdminPanelEnabled(SessionUtils.getUserName());
+		loadTree();
 	}
 
 	public void expandRow() {
@@ -154,6 +163,7 @@ public class InventoryBean implements Serializable {
 			}
 		}
 		calculateTotalStock();
+		getAvgPrice();
 		Iterator<LogDataType> itr_his = historyList.iterator();
 		while (itr_his.hasNext()) {
 			LogDataType temp = itr_his.next();
@@ -175,6 +185,15 @@ public class InventoryBean implements Serializable {
 				sum += currItem.getItem().Stock;
 			}
 			currCat.getItem().setStock(sum);
+		}
+	}
+
+	public void getAvgPrice() {
+		Iterator<TreeNode> itr = root.getChildren().iterator();
+		while (itr.hasNext()) {
+			TreeNode currNode = itr.next();
+			ItemDataType currCat = (ItemDataType) currNode.getData();
+			currCat.getItem().setPrice(dbconn.getAvgPrice(currCat.getCat().getItemCategory()));
 		}
 	}
 

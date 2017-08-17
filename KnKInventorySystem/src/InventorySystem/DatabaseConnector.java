@@ -27,7 +27,7 @@ public class DatabaseConnector {
 	private final String GetHistoryByOrder = "{ call getHistoryByOrder (?,?,?)}"; // Order,DateFrom,DateTo
 	private final String AddUserHistoryJDBCCall = "{ call addUserHistory (?,?,?,?,?,?,?,?)}"; // Employee,ItemCode,ItemVaraitionm,ItemCategory,Quantity,OrderDetails,Action,ItemID
 	private final String ChangeCategory = "{ call ChangeCategory (?,?,?)}"; // ItemCatID,ItemCategory,ItemSubCategory
-	private final String AddCategory = "{ call AddCategory (?,?)}"; // ItemCatID,ItemCategory,ItemSubCategory
+	private final String AddCategory = "{ call AddCategory (?,?,?)}"; // ItemCatID,ItemCategory,ItemSubCategory
 	private final String DeleteCategory = "{ call DeleteCategory (?)}"; // ItemCatID,ItemCategory,ItemSubCategory
 	private final String GetCategories = "{ call GetCategories }";
 	private final String markHistoryAsError = "{ call MarkUserHistoryAsError (?)}";// LogID
@@ -39,6 +39,7 @@ public class DatabaseConnector {
 	private final String getLogins_all = "{ call getLogins_all }";
 	private final String getRights = "{ call getRights (?) }";
 	private final String editItem = "{ call updateItem(?,?,?,?,?,?,?)}";
+	private final String getAvgPrice="{ call getAvgPrice(?)}";
 	Connection conn;
 
 	public void ConnectToDB() {
@@ -79,6 +80,32 @@ public class DatabaseConnector {
 		return false;
 	}
 
+	public double getAvgPrice(String cat) {
+		ConnectToDB();
+		ResultSet rs = null;
+		double result;
+		CallableStatement call=null;
+		try {
+			call = conn.prepareCall(getAvgPrice);
+			call.setString(1,cat);
+			rs = call.executeQuery();
+			rs.next();
+			result = rs.getDouble(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		} finally {
+			try {
+				call.close();
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return 0;
+			}
+		}
+		return result;
+	}
+
 	public List<Logins> getLogins_all() {
 		ConnectToDB();
 		List<Logins> temp = new ArrayList<>();
@@ -100,12 +127,13 @@ public class DatabaseConnector {
 		}
 		return temp;
 	}
-	
-	public Boolean editItem(int ItemID, String ItemCode,String ItemVariation, String ItemCategory,int Quantity, double price, String ImageName) {
+
+	public Boolean editItem(int ItemID, String ItemCode, String ItemVariation, String ItemCategory, int Quantity,
+			double price, String ImageName) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(editItem);
-			call.setInt(1,ItemID);
+			call.setInt(1, ItemID);
 			call.setString(2, ItemCode);
 			call.setString(3, ItemVariation);
 			call.setString(4, ItemCategory);
@@ -128,6 +156,7 @@ public class DatabaseConnector {
 		}
 		return false;
 	}
+
 	public Boolean addLogin(String Username, String Password, int AdminPanelEnabled) {
 		ConnectToDB();
 		try {
@@ -279,12 +308,13 @@ public class DatabaseConnector {
 		return false;
 	}
 
-	public Boolean AddCategory(String ItemCategory, String ItemSubcategory) {
+	public Boolean AddCategory(String ItemCategory, String ItemSubcategory,int showOrder) {
 		ConnectToDB();
 		try {
 			CallableStatement call = conn.prepareCall(AddCategory);
 			call.setString(1, ItemCategory);
 			call.setString(2, ItemSubcategory);
+			call.setInt(3, showOrder);
 			call.executeUpdate();
 			if (call.getUpdateCount() >= 1)
 				return true;

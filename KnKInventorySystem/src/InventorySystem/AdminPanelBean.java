@@ -108,7 +108,7 @@ public class AdminPanelBean implements Serializable {
 	}
 
 	public void addCategory(String Category) {
-		if (dbconn.AddCategory(Category, Category))
+		if (dbconn.AddCategory(Category, Category,categories.size()+1))
 			categories = dbconn.getCategories();
 		else {
 			context = FacesContext.getCurrentInstance();
