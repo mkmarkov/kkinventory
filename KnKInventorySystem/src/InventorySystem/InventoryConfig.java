@@ -18,11 +18,11 @@ public class InventoryConfig {
 	public static Properties getProp() {
 		return prop;
 	}
-
-	public static void setProp(Properties prop) {
-		InventoryConfig.prop = prop;
+	
+	public static String getPropperty(String key)
+	{
+		return prop.getProperty(key);
 	}
-
 	public static void init() {
 		try {
 			ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();

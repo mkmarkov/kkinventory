@@ -2,7 +2,6 @@ package administrator;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,13 +12,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
 
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
 
@@ -57,6 +52,8 @@ public class itemManagementBean implements Serializable {
 	List<LogDataType> userReport = new ArrayList<>();
 	FacesContext context = FacesContext.getCurrentInstance();
 	StockItemDataType newitem = new StockItemDataType();
+	int newcat_order;
+	String newcat = "";
 	public boolean newuser_adminEnabled;
 	private String newItem_imageName = "NA.jpg";
 	public Date dateFrom;
@@ -78,6 +75,7 @@ public class itemManagementBean implements Serializable {
 		root.getChildren().clear();
 		stockList = dbconn.SearchStock("", "", 0);
 		categories = dbconn.getCategories();
+		newcat_order = categories.size()+1;
 		loadTree();
 		// }
 	}
@@ -91,6 +89,25 @@ public class itemManagementBean implements Serializable {
 		stockList = dbconn.SearchStock("", "", 0);
 		categories = dbconn.getCategories();
 		loadTree();
+	}
+
+	private void swap(int x, int y, List<ItemCategoryDataType> cats) {
+		ItemCategoryDataType temp = cats.get(x);
+		cats.set(x, cats.get(y));
+		cats.set(y, temp);
+	}
+
+	public void up() {
+		int x = categories.indexOf(selectedCategory);
+		int y = x - 1;
+		if (x >= 0 && y >= 0)
+			swap(x, y, categories);
+	}
+	public void down() {
+		int x = categories.indexOf(selectedCategory);
+		int y = x + 1;
+		if (x >= 0 && y >= 0)
+			swap(x, y, categories);
 	}
 
 	public void loadTree() {
@@ -192,22 +209,6 @@ public class itemManagementBean implements Serializable {
 		reload();
 	}
 
-	public StreamedContent getImage() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-			return new DefaultStreamedContent();
-		} else {
-			String filepath = InventoryConfig.prop.getProperty("downloadPath");
-			try {
-				return new DefaultStreamedContent(
-						new FileInputStream(new File(filepath, selectedItem.getItem().ImageName)));
-			} catch (Exception e) {
-				System.out.println("Error streaming image");
-			}
-		}
-		return null;
-	}
-
 	public void deleteStock(String Employee) {
 		if (dbconn.deleteStock(selectedItem.getItem().ItemID))
 			dbconn.addUserHistory(Employee, selectedItem.getItem().ItemCode, selectedItem.getItem().ItemVariation,
@@ -243,8 +244,8 @@ public class itemManagementBean implements Serializable {
 		reload();
 	}
 
-	public void addCategory(String Category) {
-		if (dbconn.AddCategory(Category, Category, categories.size() + 1)) {
+	public void addCategory() {
+		if (dbconn.AddCategory(newcat, newcat, newcat_order)) {
 			categories = dbconn.getCategories();
 		} else {
 			context = FacesContext.getCurrentInstance();
@@ -443,4 +444,21 @@ public class itemManagementBean implements Serializable {
 		if (this.file == null)
 			this.editFile = file;
 	}
+
+	public int getNewcat_order() {
+		return newcat_order;
+	}
+
+	public void setNewcat_order(int newcat_order) {
+		this.newcat_order = newcat_order;
+	}
+
+	public String getNewcat() {
+		return newcat;
+	}
+
+	public void setNewcat(String newcat) {
+		this.newcat = newcat;
+	}
+
 }

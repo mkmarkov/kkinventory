@@ -24,7 +24,7 @@
 					scrollHeight="300">
 					<p:ajax event="select"
 						listener="#{itemManagementBean.setselected()}"
-						update="form:AddStockQuantitypanel" />
+						update="form:editPanel" />
 					<p:column headerText="Категория">
 			#{stock.cat.itemCategory}
 			 	</p:column>
@@ -42,8 +42,8 @@
 			 	</p:column>
 				</p:treeTable>
 
-				<p:panel id="AddStockQuantitypanel" header="Опции за артикул">
-					<p:panelGrid id="editPanel" columns="2">
+				<p:panel id="editPanel" header="Опции за артикул">
+					<p:panelGrid id="editPanelGrid" columns="2">
 						<h:outputText value="Код" />
 						<h:selectOneMenu id="edit_cat"
 							value="#{itemManagementBean.selectedItem.item.itemCategory}">
@@ -66,9 +66,6 @@
 						<p:fileUpload id="editupload"
 							value="#{itemManagementBean.editFile}" mode="simple"
 							skinSimple="true" />
-						<p:commandButton value="Виж Снимката"
-							oncomplete="PF('imageDialog').show()"
-							 update=":form:imagePanel" />
 						<p:commandButton value="Промени"
 							action="#{itemManagementBean.editItem()}" ajax="false"
 							update="form:stockpnlgrid" />
@@ -114,33 +111,24 @@
 						<p:commandButton value="Изтрий"
 							action="#{itemManagementBean.deleteCategory()}"
 							update="form:stockpnlgrid" process="@this" partialSubmit="true" />
-						<p:inputText binding="#{newcat}" />
+						<h:outputText value="Име: " />
+						<p:inputText value="#{itemManagementBean.newcat}" />
+						<h:outputText value="Ред на показване" />
+						<p:inputText value="#{itemManagementBean.newcat_order}"
+							type="number" disabled="true" />
+						<p:commandButton value="Нагоре"
+							action="#{itemManagementBean.up()}" update="form:stockpnlgrid"
+							disabled="true" />
+						<p:commandButton value="Надолу"
+							action="#{itemManagementBean.down()}" update="form:stockpnlgrid"
+							disabled="true" />
 						<p:commandButton value="Добави"
-							action="#{itemManagementBean.addCategory(newcat.value)}"
+							action="#{itemManagementBean.addCategory()}"
 							update="form:stockpnlgrid" />
 					</p:panelGrid>
 				</p:panel>
 			</p:panelGrid>
-			<p:dialog header="Image" id="imagePanel" widgetVar="imageDialog"
-				resizable="false" size="300">
-				<p:graphicImage
-					value="#{itemManagementBean.image}">
-					<f:param name="filename"
-						value="#{itemManagementBean.selectedItem.item.imageName}" />
-				</p:graphicImage>
-				<p:panelGrid columns="2">
-					<h:outputText value="Код" />
-					<h:outputText value="#{inventoryBean.selectedItem.item.itemCode}" />
-					<h:outputText value="Код" />
-					<h:outputText
-						value="#{inventoryBean.selectedItem.item.itemVariation}" />
-					<h:outputText value="Код" />
-					<h:outputText vallue="#{inventoryBean.selectedItem.item.color}" />
-					<h:outputText value="Код" />
-					<h:outputText
-						value="#{inventoryBean.selectedItem.item.itemCategory}" />
-				</p:panelGrid>
-			</p:dialog>
+
 		</h:form>
 	</ui:define>
 </ui:composition>
