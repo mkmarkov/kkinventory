@@ -75,7 +75,7 @@ public class itemManagementBean implements Serializable {
 		root.getChildren().clear();
 		stockList = dbconn.SearchStock("", "", 0);
 		categories = dbconn.getCategories();
-		newcat_order = categories.size()+1;
+		newcat_order = categories.size() + 1;
 		loadTree();
 		// }
 	}
@@ -103,11 +103,28 @@ public class itemManagementBean implements Serializable {
 		if (x >= 0 && y >= 0)
 			swap(x, y, categories);
 	}
+
 	public void down() {
 		int x = categories.indexOf(selectedCategory);
 		int y = x + 1;
 		if (x >= 0 && y >= 0)
 			swap(x, y, categories);
+	}
+
+	public void deleteCategory() {
+		Iterator<ItemCategoryDataType> itr = categories.iterator();
+		int catid = 0;
+		while (itr.hasNext()) {
+			ItemCategoryDataType temp = itr.next();
+			if (temp.getItemCategory().trim().equals(selectedCategory))
+				catid = temp.getItemCatID();
+		}
+		if (dbconn.deleteCategory(catid)) {
+			categories = dbconn.getCategories();
+		} else {
+			context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
+		}
 	}
 
 	public void loadTree() {
@@ -250,22 +267,6 @@ public class itemManagementBean implements Serializable {
 		} else {
 			context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Грешка при добавяне на категория", ""));
-		}
-	}
-
-	public void deleteCategory() {
-		Iterator<ItemCategoryDataType> itr = categories.iterator();
-		int catid = 0;
-		while (itr.hasNext()) {
-			ItemCategoryDataType temp = itr.next();
-			if (temp.getItemCategory().trim().equals(selectedCategory))
-				catid = temp.getItemCatID();
-		}
-		if (dbconn.deleteCategory(catid)) {
-			categories = dbconn.getCategories();
-		} else {
-			context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Грешка при изтриване на категория", ""));
 		}
 	}
 
